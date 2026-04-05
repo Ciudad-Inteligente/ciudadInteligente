@@ -139,14 +139,17 @@ public class RegistroCiudadano extends AppCompatActivity {
         // La contraseña ya está hasheada por Firebase Auth, no se almacena aquí
 
         db.collection("users")
-                .add(usuario)
-                .addOnCompleteListener(new OnCompleteListener<com.google.firebase.firestore.DocumentReference>() {
+                .document(mAuth.getCurrentUser().getUid())
+                .set(usuario)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(Task<com.google.firebase.firestore.DocumentReference> task) {
+                    public void onComplete(Task<Void> task) {
                         if (task.isSuccessful()) {
                             textViewMensaje.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                             textViewMensaje.setText("¡Registro exitoso! Ahora puedes iniciar sesión.");
                             limpiarCampos();
+                            // Volver a LoginUsuario
+                            finish();
                         } else {
                             textViewMensaje.setText("Error al guardar usuario en la base de datos.");
                         }

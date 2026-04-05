@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CiudadInteligente">
         <activity
-            android:name=".RegistroCiudadano"
+            android:name=".LoginUsuario"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,6 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".RegistroCiudadano"
+            android:exported="false" />
+        <activity
+            android:name=".DashboardCiudadano"
+            android:exported="false" />
     </application>
 
 </manifest>
