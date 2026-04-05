@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "1006002311772",
+    "project_id": "ciudadinteligente-a3d5b",
+    "storage_bucket": "ciudadinteligente-a3d5b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006002311772:android:ef44276db0154ed5c24c99",
+        "android_client_info": {
+          "package_name": "com.example.ciudadinteligente"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFzfEttThV5Uf0A6Ytf1j4UyGg15Ze2NQ"
+        }
+      ],
+      "services": {
+        "auth_service": {
+          "state": "ENABLED"
+        },
+        "cloud_firestore_service": {
+          "state": "ENABLED"
+        },
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
