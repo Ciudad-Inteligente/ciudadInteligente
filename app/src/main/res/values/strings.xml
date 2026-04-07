@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">CiudadInteligente</string>
+
+    <!-- Dashboard strings -->
+    <string name="app_title">BugaReporta+</string>
+    <string name="app_slogan">Reporta. Mejora. Transforma.</string>
+    <string name="logo_description">Logo</string>
+    <string name="profile_description">Perfil</string>
+    <string name="welcome_message">Buenos días, Usuario</string>
+    <string name="verified_citizen">Ciudadano verificado</string>
+    <string name="latest_reports">Últimos reportes</string>
+    <string name="logout">Cerrar sesión</string>
 </resources>
