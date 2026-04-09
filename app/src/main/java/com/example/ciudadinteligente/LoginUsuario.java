@@ -115,9 +115,8 @@ public class LoginUsuario extends AppCompatActivity {
                     @Override
                     public void onComplete(Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Autenticación exitosa, ahora obtener rol de Firestore
-                            String uid = mAuth.getCurrentUser().getUid();
-                            obtenerRolUsuario(uid);
+                            // Autenticación exitosa, verificar estado del usuario
+                            verificarEstadoUsuario();
                         } else {
                             // Error en la autenticación
                             String errorMessage = "Error al iniciar sesión";
@@ -125,6 +124,90 @@ public class LoginUsuario extends AppCompatActivity {
                                 errorMessage = task.getException().getMessage();
                             }
                             textViewMensaje.setText(errorMessage);
+                        }
+                    }
+                });
+    }
+
+    private void verificarEstadoUsuario() {
+        String uid = mAuth.getCurrentUser().getUid();
+
+        // Verificar si el correo está verificado en Firebase Auth
+        boolean emailVerified = mAuth.getCurrentUser().isEmailVerified();
+
+        // Obtener el estado del usuario en Firestore
+        db.collection("users")
+                .document(uid)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                String estado = document.getString("estado");
+                                String rol = document.getString("rol");
+
+                                // Verificar si el correo está verificado
+                                if (!emailVerified) {
+                                    // Correo no verificado
+                                    mAuth.signOut(); // Cerrar sesión
+                                    textViewMensaje.setText("Por favor, verifica tu correo electrónico antes de continuar.");
+                                    return;
+                                }
+
+                                // Si el correo está verificado pero el estado sigue siendo PENDIENTE, actualizar a ACTIVO
+                                if ("PENDIENTE".equals(estado) && emailVerified) {
+                                    actualizarEstadoUsuario(uid, "ACTIVO");
+                                    return;
+                                }
+
+                                // Verificar el estado del usuario
+                                if ("ACTIVO".equals(estado)) {
+                                    if (rol != null && rol.equals("Ciudadano")) {
+                                        // Usuario activo, redirigir a DashboardCiudadano
+                                        Intent intent = new Intent(LoginUsuario.this, DashboardCiudadano.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        mAuth.signOut();
+                                        textViewMensaje.setText("Rol no reconocido. Contacta con soporte.");
+                                    }
+                                } else if ("INACTIVO".equals(estado)) {
+                                    mAuth.signOut();
+                                    textViewMensaje.setText("Tu cuenta está inactiva. Contacta con soporte.");
+                                } else if ("SUSPENDIDO".equals(estado)) {
+                                    mAuth.signOut();
+                                    textViewMensaje.setText("Tu cuenta ha sido suspendida. Contacta con soporte.");
+                                } else {
+                                    mAuth.signOut();
+                                    textViewMensaje.setText("Estado de cuenta no reconocido. Contacta con soporte.");
+                                }
+                            } else {
+                                mAuth.signOut();
+                                textViewMensaje.setText("No se encontró información del usuario en la base de datos.");
+                            }
+                        } else {
+                            mAuth.signOut();
+                            textViewMensaje.setText("Error al obtener datos del usuario");
+                        }
+                    }
+                });
+    }
+
+    private void actualizarEstadoUsuario(String uid, String nuevoEstado) {
+        db.collection("users")
+                .document(uid)
+                .update("estado", nuevoEstado)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Estado actualizado, obtener datos y redirigir
+                            obtenerRolUsuario(uid);
+                        } else {
+                            mAuth.signOut();
+                            textViewMensaje.setText("Error al actualizar el estado del usuario.");
                         }
                     }
                 });
@@ -159,3 +242,4 @@ public class LoginUsuario extends AppCompatActivity {
                 });
     }
 }
+

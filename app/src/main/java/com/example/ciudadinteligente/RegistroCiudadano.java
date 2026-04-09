@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -116,7 +117,22 @@ public class RegistroCiudadano extends AppCompatActivity {
                     @Override
                     public void onComplete(Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            guardarUsuarioFirestore(identificacion, nombre, correo);
+                            // Enviar correo de verificación
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                user.sendEmailVerification()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(Task<Void> verificationTask) {
+                                                if (verificationTask.isSuccessful()) {
+                                                    // Correo de verificación enviado exitosamente
+                                                    guardarUsuarioFirestore(identificacion, nombre, correo);
+                                                } else {
+                                                    textViewMensaje.setText("Error al enviar correo de verificación.");
+                                                }
+                                            }
+                                        });
+                            }
                         } else {
                             if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                 textViewMensaje.setText("El correo ya está registrado.");
@@ -136,6 +152,7 @@ public class RegistroCiudadano extends AppCompatActivity {
         usuario.put("rol", "Ciudadano");
         usuario.put("area", null);
         usuario.put("cargo", null);
+        usuario.put("estado", "PENDIENTE"); // Estado inicial: pendiente de verificación de correo
         // La contraseña ya está hasheada por Firebase Auth, no se almacena aquí
 
         db.collection("users")
@@ -146,7 +163,7 @@ public class RegistroCiudadano extends AppCompatActivity {
                     public void onComplete(Task<Void> task) {
                         if (task.isSuccessful()) {
                             textViewMensaje.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-                            textViewMensaje.setText("¡Registro exitoso! Ahora puedes iniciar sesión.");
+                            textViewMensaje.setText("¡Registro exitoso! Verifica tu correo electrónico para activar tu cuenta.");
                             limpiarCampos();
                             // Volver a LoginUsuario
                             finish();
