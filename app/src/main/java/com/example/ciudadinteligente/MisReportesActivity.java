@@ -47,10 +47,8 @@ public class MisReportesActivity extends AppCompatActivity {
     private List<ReporteItem> listaCompleta = new ArrayList<>();
     private MisReportesAdapter adaptador;
     
-    // Diccionario para traducir IDs a nombres legibles (ej: "2EnKu..." -> "Hueco / bache")
     private Map<String, String> mapaNombresTipos = new HashMap<>();
 
-    // Filtros
     private String filtroActivo = "todos";
     private TextView filtroTodos, filtroPendiente, filtroEnRevision,
             filtroEnProceso, filtroResuelto, filtroRechazado;
@@ -61,10 +59,8 @@ public class MisReportesActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_mis_reportes);
         
-        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Solo aplicamos padding arriba (barra estado) y a los lados, dejando el bottom en 0
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
@@ -72,14 +68,12 @@ public class MisReportesActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db    = FirebaseFirestore.getInstance();
 
-        // Vincular vistas
         recycler        = findViewById(R.id.recyclerMisReportes);
         progressBar     = findViewById(R.id.progressBar);
         layoutVacio     = findViewById(R.id.layoutVacio);
         tvMensajeVacio  = findViewById(R.id.tvMensajeVacio);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
-        // Chips de filtro
         filtroTodos       = findViewById(R.id.filtroTodos);
         filtroPendiente   = findViewById(R.id.filtroPendiente);
         filtroEnRevision  = findViewById(R.id.filtroEnRevision);
@@ -88,7 +82,14 @@ public class MisReportesActivity extends AppCompatActivity {
         filtroRechazado   = findViewById(R.id.filtroRechazado);
 
         recycler.setLayoutManager(new LinearLayoutManager(this));
-        adaptador = new MisReportesAdapter(new ArrayList<>());
+        
+        // CORRECCIÓN: Pasar el listener al adaptador
+        adaptador = new MisReportesAdapter(new ArrayList<>(), reporteId -> {
+            Intent intent = new Intent(this, DetalleReporteActivity.class);
+            intent.putExtra("REPORTE_ID", reporteId);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
         recycler.setAdapter(adaptador);
 
         bottomNav.setSelectedItemId(R.id.nav_mis_reportes);
@@ -103,14 +104,11 @@ public class MisReportesActivity extends AppCompatActivity {
             } else if (id == R.id.nav_reportar) {
                 intent = new Intent(this, ReportarActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            } else if (id == R.id.nav_estadisticas) {
-                Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
-                return true;
             }
 
             if (intent != null) {
                 startActivity(intent);
-                overridePendingTransition(0, 0); // Quitar parpadeo
+                overridePendingTransition(0, 0);
                 finish();
                 return true;
             }
@@ -118,8 +116,6 @@ public class MisReportesActivity extends AppCompatActivity {
         });
 
         configurarFiltros();
-
-        // PASO 1: Cargar los nombres de los tipos, LUEGO los reportes
         cargarDiccionarioYReportes();
     }
 
@@ -134,35 +130,25 @@ public class MisReportesActivity extends AppCompatActivity {
 
     private void aplicarFiltro(String estado, TextView chipSeleccionado) {
         filtroActivo = estado;
-
-        // Resetear estilos de todos los chips
         TextView[] chips = {filtroTodos, filtroPendiente, filtroEnRevision, filtroEnProceso, filtroResuelto, filtroRechazado};
         for (TextView chip : chips) {
             chip.setBackgroundResource(R.drawable.chip_gris);
             chip.setTextColor(Color.parseColor("#555555"));
         }
-
-        // Marcar el seleccionado
         chipSeleccionado.setBackgroundResource(R.drawable.chip_naranja);
         chipSeleccionado.setTextColor(Color.parseColor("#E07A1B"));
 
-        // Filtrar la lista local
         List<ReporteItem> filtrada = new ArrayList<>();
         for (ReporteItem item : listaCompleta) {
             if (estado.equals("todos") || estado.equals(item.estado)) {
                 filtrada.add(item);
             }
         }
-
         adaptador.actualizarLista(filtrada);
-
-        // Mostrar/ocultar mensaje de vacío
         if (filtrada.isEmpty()) {
             layoutVacio.setVisibility(View.VISIBLE);
             recycler.setVisibility(View.GONE);
-            tvMensajeVacio.setText(estado.equals("todos")
-                    ? "No tienes reportes aún"
-                    : "No tienes reportes con estado \"" + chipSeleccionado.getText() + "\"");
+            tvMensajeVacio.setText(estado.equals("todos") ? "No tienes reportes aún" : "No tienes reportes con estado \"" + chipSeleccionado.getText() + "\"");
         } else {
             layoutVacio.setVisibility(View.GONE);
             recycler.setVisibility(View.VISIBLE);
@@ -175,21 +161,19 @@ public class MisReportesActivity extends AppCompatActivity {
             for (QueryDocumentSnapshot doc : querySnapshot) {
                 mapaNombresTipos.put(doc.getId(), doc.getString("nombre"));
             }
-            cargarMisReportes(); // Ahora cargamos los reportes
+            cargarMisReportes();
         }).addOnFailureListener(e -> cargarMisReportes());
     }
 
     private void cargarMisReportes() {
         if (mAuth.getCurrentUser() == null) return;
         String uid = mAuth.getCurrentUser().getUid();
-
         db.collection("reportes")
                 .whereEqualTo("uid_ciudadano", uid)
                 .orderBy("fecha_reporte", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(this::procesarResultados)
                 .addOnFailureListener(e -> {
-                    // Reintento sin orden por si no hay índices configurados
                     db.collection("reportes").whereEqualTo("uid_ciudadano", uid).get()
                             .addOnSuccessListener(this::procesarResultados)
                             .addOnFailureListener(this::mostrarErrorFinal);
@@ -199,27 +183,23 @@ public class MisReportesActivity extends AppCompatActivity {
     private void procesarResultados(com.google.firebase.firestore.QuerySnapshot querySnapshot) {
         progressBar.setVisibility(View.GONE);
         listaCompleta.clear();
-
         if (querySnapshot.isEmpty()) {
             layoutVacio.setVisibility(View.VISIBLE);
             return;
         }
-
         for (QueryDocumentSnapshot doc : querySnapshot) {
             String fechaTexto = "";
             com.google.firebase.Timestamp ts = doc.getTimestamp("fecha_reporte");
             if (ts != null) {
                 fechaTexto = new SimpleDateFormat("dd MMM yyyy", new Locale("es", "CO")).format(ts.toDate());
             }
-
-            // Traducimos el ID al nombre real usando el diccionario
             String idTipo = doc.getString("id_tipo");
-            String nombreTipo = doc.getString("tipo_reporte"); // Intentar usar campo denormalizado
+            String nombreTipo = doc.getString("tipo_reporte");
             if (nombreTipo == null || nombreTipo.isEmpty()) {
                 nombreTipo = mapaNombresTipos.getOrDefault(idTipo, "Reporte");
             }
-
             listaCompleta.add(new ReporteItem(
+                    doc.getId(),
                     doc.getString("asunto"),
                     doc.getString("estado"),
                     nombreTipo,
@@ -228,8 +208,6 @@ public class MisReportesActivity extends AppCompatActivity {
                     fechaTexto
             ));
         }
-        
-        // Aplicar el filtro actual (por defecto "todos") para refrescar la vista
         aplicarFiltro(filtroActivo, obtenerChipPorEstado(filtroActivo));
     }
 
@@ -251,15 +229,26 @@ public class MisReportesActivity extends AppCompatActivity {
     }
 
     static class ReporteItem {
-        String asunto, estado, tipo, area, direccion, fecha;
-        ReporteItem(String as, String es, String ti, String ar, String di, String fe) {
-            this.asunto=as; this.estado=es; this.tipo=ti; this.area=ar; this.direccion=di; this.fecha=fe;
+        String id, asunto, estado, tipo, area, direccion, fecha;
+        ReporteItem(String id, String as, String es, String ti, String ar, String dir, String fe) {
+            this.id=id; this.asunto=as; this.estado=es; this.tipo=ti; this.area=ar; this.direccion=dir; this.fecha=fe;
         }
     }
 
+    // --- Adaptador con soporte para clic ---
     static class MisReportesAdapter extends RecyclerView.Adapter<MisReportesAdapter.ViewHolder> {
         private List<ReporteItem> lista;
-        MisReportesAdapter(List<ReporteItem> l) { this.lista = l; }
+        private final OnItemClickListener listener;
+
+        interface OnItemClickListener {
+            void onItemClick(String reporteId);
+        }
+
+        MisReportesAdapter(List<ReporteItem> l, OnItemClickListener listener) { 
+            this.lista = l; 
+            this.listener = listener;
+        }
+        
         void actualizarLista(List<ReporteItem> n) { this.lista = n; notifyDataSetChanged(); }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
@@ -288,6 +277,9 @@ public class MisReportesActivity extends AppCompatActivity {
             
             h.tvEstado.setText(formatearEstado(i.estado));
             aplicarColorEstado(h.tvEstado, i.estado);
+
+            // CORRECCIÓN: Al hacer clic, abrir detalle
+            h.itemView.setOnClickListener(v -> listener.onItemClick(i.id));
         }
 
         @Override

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="16dp">
+
+    <!-- Línea de tiempo (indicador visual) -->
+    <LinearLayout
+        android:layout_width="20dp"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/white_circle"
+            android:backgroundTint="#E07A1B" />
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#DDD" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="12dp">
+
+        <TextView
+            android:id="@+id/tvHistorialEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado cambiado a: Resuelto"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#333" />
+
+        <TextView
+            android:id="@+id/tvHistorialFecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10 de enero 2026 · 14:30"
+            android:textSize="11sp"
+            android:textColor="#999"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvHistorialMensaje"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="El equipo de mantenimiento ha reparado el daño reportado."
+            android:textSize="13sp"
+            android:textColor="#666"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>
