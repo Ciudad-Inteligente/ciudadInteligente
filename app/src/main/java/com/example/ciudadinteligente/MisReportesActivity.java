@@ -83,7 +83,6 @@ public class MisReportesActivity extends AppCompatActivity {
 
         recycler.setLayoutManager(new LinearLayoutManager(this));
         
-        // CORRECCIÓN: Pasar el listener al adaptador
         adaptador = new MisReportesAdapter(new ArrayList<>(), reporteId -> {
             Intent intent = new Intent(this, DetalleReporteActivity.class);
             intent.putExtra("REPORTE_ID", reporteId);
@@ -168,6 +167,8 @@ public class MisReportesActivity extends AppCompatActivity {
     private void cargarMisReportes() {
         if (mAuth.getCurrentUser() == null) return;
         String uid = mAuth.getCurrentUser().getUid();
+        
+        // CORRECCIÓN: Filtrar solo los reportes donde visible no sea false
         db.collection("reportes")
                 .whereEqualTo("uid_ciudadano", uid)
                 .orderBy("fecha_reporte", Query.Direction.DESCENDING)
@@ -188,6 +189,10 @@ public class MisReportesActivity extends AppCompatActivity {
             return;
         }
         for (QueryDocumentSnapshot doc : querySnapshot) {
+            // CORRECCIÓN: Ignorar reportes marcados como no visibles (eliminación lógica)
+            Boolean visible = doc.getBoolean("visible");
+            if (visible != null && !visible) continue;
+
             String fechaTexto = "";
             com.google.firebase.Timestamp ts = doc.getTimestamp("fecha_reporte");
             if (ts != null) {
@@ -235,7 +240,6 @@ public class MisReportesActivity extends AppCompatActivity {
         }
     }
 
-    // --- Adaptador con soporte para clic ---
     static class MisReportesAdapter extends RecyclerView.Adapter<MisReportesAdapter.ViewHolder> {
         private List<ReporteItem> lista;
         private final OnItemClickListener listener;
@@ -274,11 +278,8 @@ public class MisReportesActivity extends AppCompatActivity {
             h.tvArea.setText(i.area);
             h.tvFecha.setText(i.fecha);
             h.tvDireccion.setText(i.direccion == null || i.direccion.isEmpty() ? "📍 Ubicación en mapa" : "📍 " + i.direccion);
-            
             h.tvEstado.setText(formatearEstado(i.estado));
             aplicarColorEstado(h.tvEstado, i.estado);
-
-            // CORRECCIÓN: Al hacer clic, abrir detalle
             h.itemView.setOnClickListener(v -> listener.onItemClick(i.id));
         }
 

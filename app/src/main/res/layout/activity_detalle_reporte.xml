@@ -43,13 +43,17 @@
                     android:id="@+id/ivDetalleFoto"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:background="#EEE" />
+                    android:scaleType="centerInside"
+                    android:padding="50dp"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    android:background="#EEE"
+                    app:tint="#CCC" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="center|bottom"
+                    android:layout_marginBottom="16dp"
                     android:text="Sin imagen adjunta"
                     android:textColor="#888"
                     android:textSize="12sp" />
@@ -210,7 +214,7 @@
                 android:background="@drawable/white_rounded_rect"
                 android:padding="16dp"
                 android:elevation="2dp"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -240,6 +244,18 @@
                     android:visibility="gone"/>
 
             </LinearLayout>
+
+            <!-- Botón Eliminar -->
+            <Button
+                android:id="@+id/btnEliminarReporte"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Eliminar reporte"
+                android:textColor="#D32F2F"
+                android:backgroundTint="#FFEBEE"
+                android:textStyle="bold"
+                android:layout_marginBottom="32dp"
+                app:cornerRadius="8dp"/>
 
         </LinearLayout>
     </ScrollView>

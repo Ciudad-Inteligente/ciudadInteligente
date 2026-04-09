@@ -1,12 +1,15 @@
 package com.example.ciudadinteligente;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -36,6 +39,7 @@ public class DetalleReporteActivity extends AppCompatActivity {
     private ImageView ivFoto;
     private RecyclerView rvHistorial;
     private HistorialAdapter adapter;
+    private Button btnEliminar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,7 @@ public class DetalleReporteActivity extends AppCompatActivity {
         tvSinHistorial = findViewById(R.id.tvSinHistorial);
         ivFoto = findViewById(R.id.ivDetalleFoto);
         rvHistorial = findViewById(R.id.rvHistorial);
+        btnEliminar = findViewById(R.id.btnEliminarReporte);
 
         rvHistorial.setLayoutManager(new LinearLayoutManager(this));
         adapter = new HistorialAdapter(new ArrayList<>());
@@ -70,6 +75,8 @@ public class DetalleReporteActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_mis_reportes);
+
+        btnEliminar.setOnClickListener(v -> confirmarEliminacion());
 
         if (reporteId != null) {
             cargarDatosReporte();
@@ -87,8 +94,6 @@ public class DetalleReporteActivity extends AppCompatActivity {
                         aplicarColorEstado(tvEstado, estado);
 
                         tvArea.setText(doc.getString("id_area"));
-                        
-                        // Intentar obtener tipo_reporte (nombre) o id_tipo (ID)
                         String tipo = doc.getString("tipo_reporte");
                         if (tipo == null) tipo = doc.getString("id_tipo");
                         tvTipo.setText(tipo);
@@ -107,26 +112,47 @@ public class DetalleReporteActivity extends AppCompatActivity {
     private void cargarHistorial() {
         db.collection("historial_estado")
                 .whereEqualTo("id_reporte", reporteId)
-                .orderBy("fecha", Query.Direction.DESCENDING) // Asumiendo que el campo se llama 'fecha' o 'fecha_cambio'
+                .orderBy("fecha", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
                         tvSinHistorial.setVisibility(View.VISIBLE);
                         return;
                     }
-
                     List<HistorialItem> lista = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         lista.add(new HistorialItem(
                                 doc.getString("estado_nuevo"),
                                 doc.getString("mensaje"),
-                                doc.getTimestamp("fecha") // Ajustar si el campo tiene otro nombre
+                                doc.getTimestamp("fecha")
                         ));
                     }
                     adapter.updateList(lista);
                     tvSinHistorial.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> tvSinHistorial.setVisibility(View.VISIBLE));
+    }
+
+    private void confirmarEliminacion() {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar reporte")
+                .setMessage("¿Estás seguro de que deseas eliminar este reporte? Esta acción no se puede deshacer.")
+                .setPositiveButton("Eliminar", (dialog, which) -> eliminarReporteLogico())
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void eliminarReporteLogico() {
+        // No eliminamos, cambiamos el campo 'visible' a false (eliminación lógica)
+        db.collection("reportes").document(reporteId)
+                .update("visible", false)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Reporte eliminado correctamente", Toast.LENGTH_SHORT).show();
+                    finish(); // Cerrar la pantalla y volver a la lista
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al eliminar el reporte", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void aplicarColorEstado(TextView badge, String estado) {
@@ -143,7 +169,6 @@ public class DetalleReporteActivity extends AppCompatActivity {
         badge.setTextColor(Color.parseColor(texto));
     }
 
-    // --- Clases Internas ---
     static class HistorialItem {
         String estado, mensaje;
         com.google.firebase.Timestamp fecha;
