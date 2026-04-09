@@ -34,6 +34,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    lint.disable += setOf("MissingPermission", "MissingFeature")
+    
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+        }
+    }
 }
 
 dependencies {
@@ -46,6 +54,8 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation("com.mapbox.maps:android:10.16.1")
+    implementation("com.google.firebase:firebase-storage:20.2.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

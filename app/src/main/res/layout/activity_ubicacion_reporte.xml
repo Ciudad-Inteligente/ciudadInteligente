@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UbicacionReporteActivity">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#E07A1B"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/logobugareporta"
+            android:contentDescription="@string/logo_description"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_title"
+                android:textColor="#FFF"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_slogan"
+                android:textColor="#FFF"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnPerfil"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_launcher_foreground"
+            android:background="@drawable/circle_bg"
+            android:contentDescription="@string/profile_description"
+            android:padding="2dp"/>
+    </LinearLayout>
+
+    <!-- Título — igual al tuyo, solo se referencia desde el Java -->
+    <TextView
+        android:id="@+id/tvTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2. Ubicación"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#222"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"/>
+
+    <!--
+        MODIFICACIÓN: cambiamos tvSubtitulo por tvInstruccion
+        y el color a naranja igual al prototipo.
+        El Java referencia este ID como tvInstruccion.
+    -->
+    <TextView
+        android:id="@+id/tvInstruccion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona en el mapa la ubicación del reporte"
+        android:textSize="14sp"
+        android:textColor="#E07A1B"
+        app:layout_constraintTop_toBottomOf="@id/tvTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"/>
+
+    <!--
+        Mapa — igual al tuyo pero con atributos de cámara
+        para que arranque centrado en Buga sin esperar al Java.
+        La altura sube a 0dp con layout_constraintBottom_toTopOf
+        para que use todo el espacio disponible entre la instrucción
+        y el texto de coordenadas, en lugar de los 300dp fijos.
+    -->
+    <com.mapbox.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tvInstruccion"
+        app:layout_constraintBottom_toTopOf="@id/tvCoordenadas"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:mapbox_cameraTargetLat="3.9009"
+        app:mapbox_cameraTargetLng="-76.2975"
+        app:mapbox_cameraZoom="14"/>
+
+    <!--
+        NUEVO: muestra las coordenadas del punto que tocó el usuario.
+        El Java lo actualiza cada vez que se toca el mapa.
+        Está entre el mapa y el botón siguiente.
+    -->
+    <!-- tvCoordenadas apunta hacia etDireccion, no al botón -->
+    <TextView
+        android:id="@+id/tvCoordenadas"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="📍 Toca el mapa para seleccionar la ubicación"
+        android:textSize="12sp"
+        android:textColor="#888888"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        app:layout_constraintTop_toBottomOf="@id/mapView"
+        app:layout_constraintBottom_toTopOf="@id/etDireccion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- etDireccion apunta al botón por debajo -->
+    <EditText
+        android:id="@+id/etDireccion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Dirección (Ej: Calle 5 # 3-20)"
+        android:inputType="text"
+        android:padding="12dp"
+        android:background="@drawable/input_bg"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvCoordenadas"
+        app:layout_constraintBottom_toTopOf="@id/btnSiguiente"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Botón siguiente — igual al tuyo, sin cambios -->
+    <Button
+        android:id="@+id/btnSiguiente"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Siguiente"
+        android:backgroundTint="#E07A1B"
+        android:textColor="#FFF"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"/>
+
+    <!-- Navbar — igual al tuyo, sin cambios -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#FFF"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
