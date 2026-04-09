@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">CiudadInteligente</string>
+
+    <!-- Recuperación de contraseña -->
+    <string name="titulo_recuperar_contrasena">Recuperar Contraseña</string>
+    <string name="mensaje_recuperacion_informativo">Ingresa tu correo electrónico para recuperar tu contraseña</string>
+    <string name="label_email">Correo Electrónico</string>
+    <string name="hint_email">usuario@correo.com</string>
+    <string name="boton_recuperar_contrasena">Recuperar Contraseña</string>
+    <string name="boton_cancelar">Cancelar</string>
+    <string name="error_email_requerido">Por favor ingresa tu correo electrónico</string>
+    <string name="error_email_invalido">Correo electrónico inválido</string>
+    <string name="mensaje_recuperacion_exitosa">Si el correo está registrado, recibirás un enlace de recuperación</string>
+    <string name="error_servicio_recuperacion">No se pudo procesar la solicitud. Intenta más tarde</string>
 </resources>

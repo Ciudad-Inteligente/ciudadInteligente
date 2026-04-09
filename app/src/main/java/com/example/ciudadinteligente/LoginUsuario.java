@@ -76,8 +76,9 @@ public class LoginUsuario extends AppCompatActivity {
         textViewOlvideContrasena.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: Implementar recuperación de contraseña
-                Toast.makeText(LoginUsuario.this, "Recuperación de contraseña", Toast.LENGTH_SHORT).show();
+                // Mostrar diálogo de recuperación de contraseña
+                RecuperarContraseñaDialogFragment dialogFragment = new RecuperarContraseñaDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(), "RecuperarContraseña");
             }
         });
     }

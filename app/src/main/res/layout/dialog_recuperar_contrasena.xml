@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background"
+    android:padding="24dp">
+
+    <!-- Título del diálogo -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/titulo_recuperar_contrasena"
+        android:textSize="20sp"
+        android:textColor="#333333"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Mensaje informativo -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/mensaje_recuperacion_informativo"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Campo de correo electrónico -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_email"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="6dp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/editTextEmailRecuperar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="@string/hint_email"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:background="#FFFFFF"
+        android:textColor="#333333"
+        android:textColorHint="#AAAAAA"
+        android:layout_marginBottom="20dp"
+        android:elevation="2dp" />
+
+    <!-- Mensaje de error/info -->
+    <TextView
+        android:id="@+id/textViewMensajeRecuperacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Contenedor de botones -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:spacing="12dp">
+
+        <!-- Botón Cancelar -->
+        <Button
+            android:id="@+id/btnCancelarRecuperacion"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="@string/boton_cancelar"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:background="#CCCCCC"
+            android:textStyle="bold"
+            android:elevation="2dp" />
+
+        <!-- Botón Recuperar Contraseña -->
+        <Button
+            android:id="@+id/btnRecuperarContrasena"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/boton_recuperar_contrasena"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:background="#B25E15"
+            android:textStyle="bold"
+            android:elevation="2dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
