@@ -7,53 +7,74 @@
     android:layout_height="match_parent"
     tools:context=".LoginUsuario">
 
-    <!-- Imagen de fondo -->
+    <!-- Fondo -->
     <ImageView
         android:id="@+id/imagenFondo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitCenter"
+        android:scaleX="1.5"
+        android:scaleY="4.5"
         android:src="@drawable/fondologin"
+        android:importantForAccessibility="no"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Contenedor principal con scroll para que no se corte en pantallas pequeñas -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <!-- Capa blanca suave -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#55FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Scroll -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:paddingTop="40dp"
-            android:paddingBottom="40dp">
+            android:gravity="center_horizontal"
+            android:padding="24dp">
 
             <!-- Logo -->
             <ImageView
                 android:id="@+id/logoApp"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_marginBottom="20dp"
-                android:src="@drawable/logobugareporta"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginBottom="-20dp"
+                android:src="@drawable/logobugareportamas"
                 android:contentDescription="@string/app_name"
                 android:scaleType="fitCenter" />
 
-            <!-- Caja transparente blanca para el formulario -->
+            <!-- Frase -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reporta. Mejora. Transforma."
+                android:textSize="13sp"
+                android:textColor="#6E6E6E"
+                android:layout_marginBottom="30dp" />
+
+            <!-- Caja formulario -->
             <LinearLayout
-                android:layout_width="300dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#E0FFFFFF"
-                android:padding="30dp"
-                android:layout_margin="20dp"
+                android:background="@drawable/bg_form_login"
+                android:padding="24dp"
                 android:elevation="8dp">
 
                 <!-- Título -->
@@ -61,82 +82,86 @@
                     android:id="@+id/textViewTitulo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Iniciar sesión"
-                    android:textSize="24sp"
-                    android:textColor="#333333"
-                    android:textStyle="bold"
+                    android:layout_marginBottom="20dp"
                     android:gravity="center"
-                    android:layout_marginBottom="24dp" />
+                    android:text="Iniciar sesión"
+                    android:textColor="#61461D"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-                <!-- Email -->
+                <!-- Correo -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Correo"
                     android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="6dp"
-                    android:textStyle="bold" />
+                    android:textColor="#5E5E5E"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
 
                 <EditText
                     android:id="@+id/editTextEmail"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="50dp"
                     android:hint="usuario@correo.com"
                     android:inputType="textEmailAddress"
-                    android:padding="12dp"
-                    android:background="#FFFFFF"
-                    android:textColor="#333333"
-                    android:textColorHint="#AAAAAA"
-                    android:layout_marginBottom="16dp"
-                    android:elevation="2dp" />
+                    android:autofillHints="emailAddress"
+                    android:padding="14dp"
+                    android:background="@drawable/bg_input"
+                    android:textColor="#2F2F2F"
+                    android:textColorHint="#A0A0A0"
+                    android:layout_marginBottom="16dp" />
 
-                <!-- Password -->
+                <!-- Contraseña -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Contraseña"
                     android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="6dp"
-                    android:textStyle="bold" />
+                    android:textColor="#5E5E5E"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
 
                 <EditText
                     android:id="@+id/editTextPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="50dp"
                     android:hint="Contraseña"
                     android:inputType="textPassword"
-                    android:padding="12dp"
-                    android:background="#FFFFFF"
-                    android:textColor="#333333"
-                    android:textColorHint="#AAAAAA"
-                    android:layout_marginBottom="24dp"
-                    android:elevation="2dp" />
+                    android:autofillHints="password"
+                    android:padding="14dp"
+                    android:background="@drawable/bg_input"
+                    android:textColor="#2F2F2F"
+                    android:textColorHint="#A0A0A0"
+                    android:layout_marginBottom="14dp" />
 
-                <!-- Checkbox Recordar sesión -->
+                <!-- Checkbox -->
                 <CheckBox
                     android:id="@+id/checkboxRecordar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Recordar sesión"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="24dp" />
+                    android:textColor="#5E5E5E"
+                    android:buttonTint="#B25E15"
+                    android:layout_marginBottom="18dp" />
 
-                <!-- Botón Entrar -->
+                <!-- Botón -->
                 <Button
                     android:id="@+id/btnEntrar"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="52dp"
                     android:text="Entrar"
                     android:textSize="16sp"
                     android:textColor="#FFFFFF"
-                    android:background="#B25E15"
                     android:textStyle="bold"
-                    android:layout_marginBottom="16dp"
-                    android:elevation="4dp" />
+                    android:background="@drawable/bg_button_primary"
+                    app:backgroundTint="@null"
+                    android:padding="12dp"
+                    android:letterSpacing="0.05"
+                    android:layout_marginBottom="14dp" />
 
-                <!-- Enlace Olvide contraseña -->
+
+                <!-- Olvidé contraseña -->
                 <TextView
                     android:id="@+id/textViewOlvideContrasena"
                     android:layout_width="match_parent"
@@ -144,59 +169,57 @@
                     android:text="¿Olvidaste tu contraseña?"
                     android:textSize="13sp"
                     android:textColor="#B25E15"
+                    android:textStyle="bold"
                     android:gravity="center"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="14dp"
                     android:clickable="true"
                     android:focusable="true" />
 
-                <!-- Separator -->
+                <!-- Línea -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#DDDDDD"
-                    android:layout_marginBottom="16dp" />
+                    android:background="#E0E0E0"
+                    android:layout_marginBottom="14dp" />
 
-                <!-- Enlace Registrarse -->
+                <!-- Registro -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="¿No tienes cuenta? "
-                        android:textSize="13sp"
-                        android:textColor="#666666" />
+                        android:textColor="#666666"
+                        android:textSize="13sp" />
 
                     <TextView
                         android:id="@+id/textViewRegistrarse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Regístrate"
-                        android:textSize="13sp"
                         android:textColor="#B25E15"
                         android:textStyle="bold"
+                        android:textSize="13sp"
                         android:clickable="true"
                         android:focusable="true" />
-
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Mensaje de error -->
+            <!-- Mensaje -->
             <TextView
                 android:id="@+id/textViewMensaje"
-                android:layout_width="300dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#FF0000"
+                android:textColor="#D32F2F"
                 android:textSize="13sp"
                 android:gravity="center"
                 android:layout_marginTop="10dp" />
 
         </LinearLayout>
-
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
