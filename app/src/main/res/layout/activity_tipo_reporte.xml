@@ -9,60 +9,13 @@
     android:background="#F5F5F5"
     tools:context=".TipoReporteActivity">
 
-    <!-- Header igual a las otras pantallas -->
-    <LinearLayout
+    <!-- Header Incluido -->
+    <include
         android:id="@+id/header"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#E07A1B"
-        android:padding="12dp"
-        android:gravity="center_vertical"
+        layout="@layout/layout_header"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/logobugareporta"
-            android:contentDescription="@string/logo_description"/>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_title"
-                android:textColor="#FFF"
-                android:textStyle="bold"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_slogan"
-                android:textColor="#FFF"
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/btnPerfil"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:src="@drawable/ic_launcher_foreground"
-            android:background="@drawable/circle_bg"
-            android:contentDescription="@string/profile_description"
-            android:padding="2dp"/>
-
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Contenido scrollable -->
     <ScrollView
@@ -111,7 +64,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- Indicador de carga — se oculta cuando llegan los datos -->
+            <!-- Indicador de carga -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
@@ -119,7 +72,7 @@
                 android:layout_gravity="center"
                 android:visibility="visible"/>
 
-            <!-- Mensaje si no hay tipos para esa área -->
+            <!-- Mensaje vacío -->
             <TextView
                 android:id="@+id/tvSinTipos"
                 android:layout_width="match_parent"
@@ -131,11 +84,7 @@
                 android:padding="20dp"
                 android:visibility="gone"/>
 
-            <!--
-                RecyclerView en vez de GridLayout fijo —
-                así los tipos vienen de Firestore y no están
-                hardcodeados en el XML
-            -->
+            <!-- RecyclerView para tipos -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerTipos"
                 android:layout_width="match_parent"
@@ -145,15 +94,14 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Navbar compartida -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <!-- Navbar Incluido -->
+    <include
         android:id="@+id/bottomNavigationView"
+        layout="@layout/layout_navbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#FFF"
-        app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

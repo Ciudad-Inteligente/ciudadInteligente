@@ -23,43 +23,39 @@ public class ReportarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_reportar);
+        
+        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
         mAuth = FirebaseAuth.getInstance();
 
-        ImageView btnPerfil = findViewById(R.id.btnPerfil);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-
-        // Marcar "Reportar" como tab activo
         bottomNav.setSelectedItemId(R.id.nav_reportar);
-
-        btnPerfil.setOnClickListener(v -> {
-            // TODO: PerfilActivity
-        });
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_reportar) {
-                return true; // ya estamos aquí
-            } else if (id == R.id.nav_inicio) {
-                // CORRECCIÓN: volver al Dashboard sin crear uno nuevo
-                Intent intent = new Intent(this, DashboardCiudadano.class);
+            if (id == R.id.nav_reportar) return true;
+            
+            Intent intent = null;
+            if (id == R.id.nav_inicio) {
+                intent = new Intent(this, DashboardCiudadano.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                finish();
-                return true;
             } else if (id == R.id.nav_mis_reportes) {
-                Intent intent = new Intent(this, MisReportesActivity.class);
+                intent = new Intent(this, MisReportesActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                return true;
             } else if (id == R.id.nav_estadisticas) {
-                // TODO: EstadisticasActivity
                 Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(0, 0); // Quitar parpadeo
+                finish();
                 return true;
             }
             return false;
@@ -70,24 +66,15 @@ public class ReportarActivity extends AppCompatActivity {
 
     private void configurarCards() {
         int[] cards = {
-                R.id.cardInfraestructura,
-                R.id.cardAlumbrado,
-                R.id.cardServicios,
-                R.id.cardMedioAmbiente,
-                R.id.cardSeguridad,
-                R.id.cardSalud,
-                R.id.cardTransito,
-                R.id.cardGobierno
+                R.id.cardInfraestructura, R.id.cardAlumbrado, R.id.cardServicios,
+                R.id.cardMedioAmbiente, R.id.cardSeguridad, R.id.cardSalud,
+                R.id.cardTransito, R.id.cardGobierno
         };
 
         String[] areas = {
-                "Infraestructura vial y espacio público",
-                "Alumbrado público",
-                "Servicios públicos domiciliarios",
-                "Medio ambiente y aseo urbano",
-                "Seguridad ciudadana",
-                "Salud pública",
-                "Tránsito y movilidad",
+                "Infraestructura vial y espacio público", "Alumbrado público",
+                "Servicios públicos domiciliarios", "Medio ambiente y aseo urbano",
+                "Seguridad ciudadana", "Salud pública", "Tránsito y movilidad",
                 "Gobierno y atención ciudadana"
         };
 
@@ -97,6 +84,7 @@ public class ReportarActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, TipoReporteActivity.class);
                 intent.putExtra("AREA_SELECCIONADA", area);
                 startActivity(intent);
+                overridePendingTransition(0, 0);
             });
         }
     }

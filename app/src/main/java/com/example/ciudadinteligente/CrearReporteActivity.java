@@ -22,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class CrearReporteActivity extends AppCompatActivity {
 
-    // Datos que vienen de las pantallas anteriores
     private String areaNombre;
     private String tipoId;
     private String tipoNombre;
@@ -30,7 +29,6 @@ public class CrearReporteActivity extends AppCompatActivity {
     private EditText etAsunto, etDescripcion;
     private TextView tvMensaje, tvContador;
 
-    // Límite de caracteres para la descripción
     private static final int MAX_CARACTERES = 300;
 
     @Override
@@ -38,18 +36,18 @@ public class CrearReporteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_crear_reporte);
+        
+        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
-        // Recibir datos de TipoReporteActivity
         areaNombre = getIntent().getStringExtra("AREA_SELECCIONADA");
         tipoId     = getIntent().getStringExtra("TIPO_ID");
         tipoNombre = getIntent().getStringExtra("TIPO_NOMBRE");
 
-        // Vincular vistas
         TextView tvChipArea  = findViewById(R.id.tvChipArea);
         TextView tvChipTipo  = findViewById(R.id.tvChipTipo);
         etAsunto             = findViewById(R.id.etAsunto);
@@ -57,66 +55,43 @@ public class CrearReporteActivity extends AppCompatActivity {
         tvMensaje            = findViewById(R.id.tvMensaje);
         tvContador           = findViewById(R.id.tvContador);
         Button btnSiguiente  = findViewById(R.id.btnSiguiente);
-        ImageView btnPerfil  = findViewById(R.id.btnPerfil);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
-        // Mostrar el área y tipo en los chips
-        // Si por alguna razón vienen nulos, mostramos texto genérico
         tvChipArea.setText(areaNombre != null ? areaNombre : "Sin área");
         tvChipTipo.setText(tipoNombre != null ? tipoNombre : "Sin tipo");
 
-        // Contador de caracteres en la descripción
-        // TextWatcher escucha cada vez que el usuario escribe algo
         etDescripcion.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int largo = s.length();
                 tvContador.setText(largo + " / " + MAX_CARACTERES);
-
-                // Cambiar color del contador cuando se acerca al límite
-                if (largo >= MAX_CARACTERES) {
-                    tvContador.setTextColor(getColor(android.R.color.holo_red_dark));
-                } else if (largo >= MAX_CARACTERES * 0.8) {
-                    // 80% del límite — aviso naranja
-                    tvContador.setTextColor(getColor(android.R.color.holo_orange_dark));
-                } else {
-                    tvContador.setTextColor(0xFFAAAAAA);
-                }
+                if (largo >= MAX_CARACTERES) tvContador.setTextColor(getColor(android.R.color.holo_red_dark));
+                else if (largo >= MAX_CARACTERES * 0.8) tvContador.setTextColor(getColor(android.R.color.holo_orange_dark));
+                else tvContador.setTextColor(0xFFAAAAAA);
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Si supera el límite, cortar el texto automáticamente
-                if (s.length() > MAX_CARACTERES) {
-                    s.delete(MAX_CARACTERES, s.length());
-                }
+            @Override public void afterTextChanged(Editable s) {
+                if (s.length() > MAX_CARACTERES) s.delete(MAX_CARACTERES, s.length());
             }
         });
 
         bottomNav.setSelectedItemId(R.id.nav_reportar);
-        btnPerfil.setOnClickListener(v -> { });
-
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_reportar) return true;
+            
+            Intent intent = null;
             if (id == R.id.nav_inicio) {
-                Intent i = new Intent(this, DashboardCiudadano.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(i);
-                finish();
-                return true;
-            }
-            if (id == R.id.nav_mis_reportes) {
-                Intent intent = new Intent(this, MisReportesActivity.class);
+                intent = new Intent(this, DashboardCiudadano.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            } else if (id == R.id.nav_mis_reportes) {
+                intent = new Intent(this, MisReportesActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                return true;
             }
-            if (id == R.id.nav_estadisticas) {
-                Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+                finish();
                 return true;
             }
             return false;
@@ -126,40 +101,13 @@ public class CrearReporteActivity extends AppCompatActivity {
     }
 
     private void validarYContinuar() {
-        // Limpiar mensaje anterior
         tvMensaje.setVisibility(View.GONE);
-        tvMensaje.setText("");
-
         String asunto      = etAsunto.getText().toString().trim();
         String descripcion = etDescripcion.getText().toString().trim();
 
-        // Validaciones en orden — mostramos el primer error que encontremos
-        if (asunto.isEmpty()) {
-            mostrarError("El asunto es obligatorio.");
-            etAsunto.requestFocus();
-            return;
-        }
-        if (asunto.length() < 5) {
-            mostrarError("El asunto debe tener al menos 5 caracteres.");
-            etAsunto.requestFocus();
-            return;
-        }
-        if (descripcion.isEmpty()) {
-            mostrarError("La descripción es obligatoria.");
-            etDescripcion.requestFocus();
-            return;
-        }
-        if (descripcion.length() < 10) {
-            mostrarError("La descripción debe tener al menos 10 caracteres.");
-            etDescripcion.requestFocus();
-            return;
-        }
+        if (asunto.isEmpty()) { mostrarError("El asunto es obligatorio."); return; }
+        if (descripcion.isEmpty()) { mostrarError("La descripción es obligatoria."); return; }
 
-        /*
-         * Todo válido — ir a la pantalla de ubicación.
-         * Pasamos todos los datos acumulados hasta ahora:
-         * área + tipo (vienen de atrás) + asunto + descripción (de esta pantalla)
-         */
         Intent intent = new Intent(this, UbicacionReporteActivity.class);
         intent.putExtra("AREA_SELECCIONADA", areaNombre);
         intent.putExtra("TIPO_ID",           tipoId);
@@ -167,6 +115,7 @@ public class CrearReporteActivity extends AppCompatActivity {
         intent.putExtra("ASUNTO",            asunto);
         intent.putExtra("DESCRIPCION",       descripcion);
         startActivity(intent);
+        overridePendingTransition(0, 0);
     }
 
     private void mostrarError(String mensaje) {

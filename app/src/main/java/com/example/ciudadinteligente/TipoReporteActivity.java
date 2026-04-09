@@ -38,54 +38,49 @@ public class TipoReporteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tipo_reporte);
+        
+        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
         db = FirebaseFirestore.getInstance();
 
-        // Recibir área de la pantalla anterior
         areaNombre = getIntent().getStringExtra("AREA_SELECCIONADA");
         if (areaNombre == null) areaNombre = "";
 
-        // Vincular vistas
         TextView tvNombreArea      = findViewById(R.id.tvNombreArea);
         TextView tvDescripcionArea = findViewById(R.id.tvDescripcionArea);
         recyclerTipos              = findViewById(R.id.recyclerTipos);
         progressBar                = findViewById(R.id.progressBar);
         tvSinTipos                 = findViewById(R.id.tvSinTipos);
-        ImageView btnPerfil        = findViewById(R.id.btnPerfil);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
         tvNombreArea.setText(areaNombre);
         tvDescripcionArea.setText(obtenerDescripcionArea(areaNombre));
 
-        // 2 columnas igual al prototipo
         recyclerTipos.setLayoutManager(new GridLayoutManager(this, 2));
 
         bottomNav.setSelectedItemId(R.id.nav_reportar);
-        btnPerfil.setOnClickListener(v -> { });
-
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_reportar) return true;
+            
+            Intent intent = null;
             if (id == R.id.nav_inicio) {
-                Intent i = new Intent(this, DashboardCiudadano.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(i);
+                intent = new Intent(this, DashboardCiudadano.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            } else if (id == R.id.nav_mis_reportes) {
+                intent = new Intent(this, MisReportesActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            }
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(0, 0);
                 finish();
-                return true;
-            }
-            if (id == R.id.nav_mis_reportes) {
-                Intent i = new Intent(this, MisReportesActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(i);
-                return true;
-            }
-            if (id == R.id.nav_estadisticas) {
-                Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
                 return true;
             }
             return false;
@@ -127,6 +122,7 @@ public class TipoReporteActivity extends AppCompatActivity {
                         intent.putExtra("TIPO_ID",           tipo.id);
                         intent.putExtra("TIPO_NOMBRE",       tipo.nombre);
                         startActivity(intent);
+                        overridePendingTransition(0, 0);
                     }));
                 })
                 .addOnFailureListener(e -> {
@@ -158,7 +154,6 @@ public class TipoReporteActivity extends AppCompatActivity {
         }
     }
 
-    // ── Modelo ──
     static class TipoReporte {
         String id, nombre, icono, area;
         TipoReporte(String id, String nombre, String icono, String area) {
@@ -167,14 +162,11 @@ public class TipoReporteActivity extends AppCompatActivity {
         }
     }
 
-    // ── Interfaz de clic ──
     interface OnTipoClickListener {
         void onClick(TipoReporte tipo);
     }
 
-    // ── Adaptador ──
     class TiposAdapter extends RecyclerView.Adapter<TiposAdapter.ViewHolder> {
-
         private final List<TipoReporte> lista;
         private final OnTipoClickListener listener;
 
@@ -195,8 +187,7 @@ public class TipoReporteActivity extends AppCompatActivity {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_tipo_reporte, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tipo_reporte, parent, false);
             return new ViewHolder(v);
         }
 
@@ -204,26 +195,8 @@ public class TipoReporteActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             TipoReporte tipo = lista.get(position);
             holder.tvNombre.setText(tipo.nombre);
-
-            /*
-             * Aquí está la clave de la imagen local:
-             * getIdentifier() busca en R.drawable el recurso
-             * cuyo nombre coincida con tipo.icono (el string de Firestore).
-             * Si no lo encuentra devuelve 0, y usamos ic_default.
-             *
-             * Ejemplo: tipo.icono = "ic_semaforo"
-             * → busca R.drawable.ic_semaforo
-             * → lo carga en el ImageView
-             */
-            int iconoId = getResources().getIdentifier(
-                    tipo.icono,          // nombre del drawable sin extensión
-                    "drawable",          // carpeta donde buscar
-                    getPackageName()     // paquete de la app
-            );
-            holder.imgIcono.setImageResource(
-                    iconoId != 0 ? iconoId : R.drawable.ic_default
-            );
-
+            int iconoId = getResources().getIdentifier(tipo.icono, "drawable", getPackageName());
+            holder.imgIcono.setImageResource(iconoId != 0 ? iconoId : R.drawable.ic_default);
             holder.itemView.setOnClickListener(v -> listener.onClick(tipo));
         }
 

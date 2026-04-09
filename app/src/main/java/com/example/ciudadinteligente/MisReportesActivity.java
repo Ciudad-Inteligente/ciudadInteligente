@@ -60,9 +60,12 @@ public class MisReportesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_mis_reportes);
+        
+        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            // Solo aplicamos padding arriba (barra estado) y a los lados, dejando el bottom en 0
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
@@ -91,15 +94,27 @@ public class MisReportesActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_mis_reportes);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            if (id == R.id.nav_mis_reportes) return true;
+            
+            Intent intent = null;
             if (id == R.id.nav_inicio) {
-                startActivity(new Intent(this, DashboardCiudadano.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-                finish();
-                return true;
+                intent = new Intent(this, DashboardCiudadano.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             } else if (id == R.id.nav_reportar) {
-                startActivity(new Intent(this, ReportarActivity.class));
+                intent = new Intent(this, ReportarActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            } else if (id == R.id.nav_estadisticas) {
+                Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
                 return true;
             }
-            return true;
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(0, 0); // Quitar parpadeo
+                finish();
+                return true;
+            }
+            return false;
         });
 
         configurarFiltros();
