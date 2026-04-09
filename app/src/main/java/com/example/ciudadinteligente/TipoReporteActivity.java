@@ -78,7 +78,13 @@ public class TipoReporteActivity extends AppCompatActivity {
                 finish();
                 return true;
             }
-            if (id == R.id.nav_mis_reportes || id == R.id.nav_estadisticas) {
+            if (id == R.id.nav_mis_reportes) {
+                Intent i = new Intent(this, MisReportesActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(i);
+                return true;
+            }
+            if (id == R.id.nav_estadisticas) {
                 Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
                 return true;
             }

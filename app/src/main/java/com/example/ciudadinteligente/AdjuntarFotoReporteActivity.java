@@ -52,8 +52,8 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
     private String areaNombre, tipoId, tipoNombre, asunto, descripcion, direccion;
     private double latitud, longitud;
 
-    private Uri    fotoUri    = null; // Uri del archivo donde se guarda la foto
-    private File   fotoFile   = null; // El archivo físico de la foto de cámara
+    private Uri    fotoUri    = null;
+    private File   fotoFile   = null;
 
     private FirebaseAuth      mAuth;
     private FirebaseFirestore db;
@@ -79,13 +79,12 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         db      = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
-        // Recibir datos de todas las pantallas anteriores
         areaNombre  = getIntent().getStringExtra("AREA_SELECCIONADA");
         tipoId      = getIntent().getStringExtra("TIPO_ID");
-        tipoNombre  = getIntent().getStringExtra("TIPO_NOMBRE");
+        tipoNombre  = getIntent().getStringExtra("TIPO_NOMBRE"); // Este es el que necesitamos guardar
         asunto      = getIntent().getStringExtra("ASUNTO");
         descripcion = getIntent().getStringExtra("DESCRIPCION");
-        direccion   = getIntent().getStringExtra("DIRECCION"); // PROBLEMA 3: viene de ubicación
+        direccion   = getIntent().getStringExtra("DIRECCION");
         latitud     = getIntent().getDoubleExtra("LATITUD",  3.9009);
         longitud    = getIntent().getDoubleExtra("LONGITUD", -76.2975);
 
@@ -107,7 +106,13 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
                 irAlInicio();
                 return true;
             }
-            if (id == R.id.nav_mis_reportes || id == R.id.nav_estadisticas) {
+            if (id == R.id.nav_mis_reportes) {
+                Intent intent = new Intent(this, MisReportesActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                return true;
+            }
+            if (id == R.id.nav_estadisticas) {
                 Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -119,24 +124,19 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         btnEnviarReporte.setOnClickListener(v -> enviarReporte());
     }
 
-    // ── PERMISOS ──────────────────────────────────────────────
-
     private void verificarPermisosCamara() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // No tiene permiso — pedirlo
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     REQUEST_CAMERA_PERMISSION);
         } else {
-            // Ya tiene permiso — abrir cámara
             tomarFoto();
         }
     }
 
     private void verificarPermisosGaleria() {
         String permiso;
-        // Android 13+ usa READ_MEDIA_IMAGES, versiones anteriores READ_EXTERNAL_STORAGE
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             permiso = Manifest.permission.READ_MEDIA_IMAGES;
         } else {
@@ -165,8 +165,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         }
     }
 
-    // ── CÁMARA Y GALERÍA ──────────────────────────────────────
-
     private void tomarFoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(getPackageManager()) == null) {
@@ -174,12 +172,8 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
             return;
         }
 
-        // CORRECCIÓN PROBLEMA 2: crear archivo físico ANTES de abrir la cámara
-        // La cámara necesita saber dónde guardar la foto de calidad completa
         try {
             fotoFile = crearArchivoFoto();
-            // FileProvider convierte la ruta del archivo en un Uri seguro
-            // que la cámara puede usar sin problemas de permisos
             fotoUri = FileProvider.getUriForFile(
                     this,
                     getApplicationContext().getPackageName() + ".fileprovider",
@@ -192,7 +186,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         }
     }
 
-    // Crea un archivo vacío con nombre único en la carpeta de caché
     private File crearArchivoFoto() throws IOException {
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 .format(new Date());
@@ -215,8 +208,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         if (resultCode != RESULT_OK) return;
 
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            // CORRECCIÓN: la foto está en fotoUri (el archivo que creamos antes)
-            // No usamos data.getParcelableExtra("data") porque ese es el thumbnail pequeño
             if (fotoUri != null) {
                 imgFotoPrevia.setImageURI(fotoUri);
                 imgFotoPrevia.setVisibility(View.VISIBLE);
@@ -225,7 +216,7 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
 
         } else if (requestCode == REQUEST_IMAGE_PICK && data != null) {
             fotoUri  = data.getData();
-            fotoFile = null; // la foto viene de galería, no de archivo local
+            fotoFile = null;
             imgFotoPrevia.setImageURI(fotoUri);
             imgFotoPrevia.setVisibility(View.VISIBLE);
             mostrarFotoLista();
@@ -236,8 +227,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         tvEstadoFoto.setText("✅ Foto lista para enviar");
         tvEstadoFoto.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
     }
-
-    // ── GUARDAR REPORTE ───────────────────────────────────────
 
     private void enviarReporte() {
         btnEnviarReporte.setEnabled(false);
@@ -254,6 +243,7 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         Map<String, Object> reporte = new HashMap<>();
         reporte.put("uid_ciudadano",   uid);
         reporte.put("id_tipo",         tipoId);
+        reporte.put("tipo_reporte",    tipoNombre); // GUARDAMOS EL NOMBRE TAMBIÉN
         reporte.put("id_area",         areaNombre);
         reporte.put("asunto",          asunto);
         reporte.put("descripcion",     descripcion);
@@ -261,7 +251,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         reporte.put("prioridad",       null);
         reporte.put("latitud",         latitud);
         reporte.put("longitud",        longitud);
-        // PROBLEMA 3: ahora la dirección viene del campo que llenó el usuario
         reporte.put("direccion",       direccion != null ? direccion : "");
         reporte.put("zona",            null);
         reporte.put("fecha_reporte",   Timestamp.now());
@@ -274,7 +263,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
                     if (fotoUri != null) {
                         subirFotoAStorage(reporteId);
                     } else {
-                        // Sin foto — reporte guardado, ir al inicio
                         mostrarExito();
                     }
                 })
@@ -287,8 +275,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
         String ruta = "fotos/" + reporteId + "/" + System.currentTimeMillis() + ".jpg";
         StorageReference fotoRef = storage.getReference().child(ruta);
 
-        // CORRECCIÓN PROBLEMA 1: siempre usamos fotoUri directamente
-        // Funciona tanto para foto de cámara (FileProvider Uri) como de galería
         fotoRef.putFile(fotoUri)
                 .addOnSuccessListener(snap ->
                         fotoRef.getDownloadUrl().addOnSuccessListener(uri ->
@@ -314,7 +300,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
                 );
     }
 
-    // PROBLEMA 3: al terminar vuelve al Dashboard, no a la pantalla anterior
     private void mostrarExito() {
         progressBar.setVisibility(View.GONE);
         Toast.makeText(this, "¡Reporte enviado exitosamente!", Toast.LENGTH_LONG).show();
@@ -322,8 +307,6 @@ public class AdjuntarFotoReporteActivity extends AppCompatActivity {
     }
 
     private void irAlInicio() {
-        // Limpia toda la pila: ReportarActivity, TipoReporte, CrearReporte,
-        // Ubicacion, Adjuntar — todas se destruyen y queda solo el Dashboard
         Intent intent = new Intent(this, DashboardCiudadano.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);

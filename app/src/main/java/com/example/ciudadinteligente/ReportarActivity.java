@@ -53,8 +53,9 @@ public class ReportarActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (id == R.id.nav_mis_reportes) {
-                // TODO: MisReportesActivity
-                Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, MisReportesActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 return true;
             } else if (id == R.id.nav_estadisticas) {
                 // TODO: EstadisticasActivity

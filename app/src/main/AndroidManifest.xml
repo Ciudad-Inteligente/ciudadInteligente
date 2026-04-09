@@ -49,6 +49,10 @@
         <activity
             android:name=".AdjuntarFotoReporteActivity"
             android:exported="false" />
+        <activity
+            android:name=".MisReportesActivity"
+            android:exported="false" />
+            />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

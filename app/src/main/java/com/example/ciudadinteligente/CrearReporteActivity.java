@@ -109,7 +109,13 @@ public class CrearReporteActivity extends AppCompatActivity {
                 finish();
                 return true;
             }
-            if (id == R.id.nav_mis_reportes || id == R.id.nav_estadisticas) {
+            if (id == R.id.nav_mis_reportes) {
+                Intent intent = new Intent(this, MisReportesActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                return true;
+            }
+            if (id == R.id.nav_estadisticas) {
                 Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show();
                 return true;
             }
