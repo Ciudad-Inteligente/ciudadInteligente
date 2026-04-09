@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CiudadInteligente</string>
 
+
     <!-- Recuperación de contraseña -->
     <string name="titulo_recuperar_contrasena">Recuperar Contraseña</string>
     <string name="mensaje_recuperacion_informativo">Ingresa tu correo electrónico para recuperar tu contraseña</string>
@@ -12,4 +13,28 @@
     <string name="error_email_invalido">Correo electrónico inválido</string>
     <string name="mensaje_recuperacion_exitosa">Si el correo está registrado, recibirás un enlace de recuperación</string>
     <string name="error_servicio_recuperacion">No se pudo procesar la solicitud. Intenta más tarde</string>
+
+    <!-- Dashboard strings -->
+    <string name="app_title">BugaReporta+</string>
+    <string name="app_slogan">Reporta. Mejora. Transforma.</string>
+    <string name="logo_description">Logo</string>
+    <string name="profile_description">Perfil</string>
+    <string name="welcome_message">Buenos días, Usuario</string>
+    <string name="verified_citizen">Ciudadano verificado</string>
+    <string name="latest_reports">Últimos reportes</string>
+    <string name="logout">Cerrar sesión</string>
+
+    <!-- Reportar Activity strings -->
+    <string name="areas_reporte">Áreas de reporte</string>
+    <string name="descripcion_areas">Selecciona el área correspondiente al problema que deseas reportar. Cada área agrupa diferentes tipos de situaciones.</string>
+    <string name="area_infraestructura">Infraestructura vial y espacio público</string>
+    <string name="area_alumbrado">Alumbrado Público</string>
+    <string name="area_servicios">Servicios públicos domiciliarios</string>
+    <string name="area_medioambiente">Medio ambiente y aseo urbano</string>
+    <string name="area_seguridad">Seguridad ciudadana</string>
+    <string name="area_salud">Salud pública</string>
+    <string name="area_transito">Transito y movilidad</string>
+    <string name="area_gobierno">Gobierno y atención ciudadana</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZXN0ZWZhanQiLCJhIjoiY21ucXJpbjBvMGFsNDJycHV2YXM3djcxZCJ9.HP8lIkLgH0ir4unRH7bj0A</string>
+
 </resources>

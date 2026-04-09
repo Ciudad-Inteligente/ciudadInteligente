@@ -7,9 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    tools:context=".DashboardCiudadano">
+    tools:context=".TipoReporteActivity">
 
-    <!-- Header compartido -->
+    <!-- Header igual a las otras pantallas -->
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="0dp"
@@ -23,7 +23,6 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:id="@+id/logoApp"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/logobugareporta"
@@ -65,13 +64,11 @@
 
     </LinearLayout>
 
-    <!-- Todo el contenido scrollable entre header y navbar -->
+    <!-- Contenido scrollable -->
     <ScrollView
         android:id="@+id/scrollContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp"
         app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,101 +80,67 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card bienvenida -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardBienvenida"
+            <!-- Nombre del área seleccionada (viene de la pantalla anterior) -->
+            <TextView
+                android:id="@+id/tvNombreArea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Área de reporte"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#222"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Descripción del área -->
+            <TextView
+                android:id="@+id/tvDescripcionArea"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="#666"
+                android:layout_marginBottom="20dp"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/textViewBienvenida"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/welcome_message"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#222"/>
-
-                    <!-- Punto verde + "Ciudadano verificado" -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="6dp">
-
-                        <View
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:background="@drawable/green_dot"
-                            android:layout_marginEnd="6dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/verified_citizen"
-                            android:textColor="#228B22"
-                            android:textSize="14sp"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Título sección reportes -->
+            <!-- Subtítulo -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/latest_reports"
-                android:textStyle="bold"
+                android:text="Selecciona el tipo de reporte"
+                android:textSize="15sp"
                 android:textColor="#444"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp"/>
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
 
-            <!--
-                RecyclerView para los últimos reportes.
-                IMPORTANTE: necesita setLayoutManager en el Java.
-                wrap_content funciona dentro de ScrollView.
-                nestedScrollingEnabled=false evita conflicto de scroll
-                entre el RecyclerView y el ScrollView padre.
-            -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerReportes"
-                android:layout_width="match_parent"
+            <!-- Indicador de carga — se oculta cuando llegan los datos -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginBottom="16dp"/>
+                android:layout_gravity="center"
+                android:visibility="visible"/>
 
-            <!-- Mensaje cuando no hay reportes (se oculta si hay datos) -->
+            <!-- Mensaje si no hay tipos para esa área -->
             <TextView
-                android:id="@+id/tvSinReportes"
+                android:id="@+id/tvSinTipos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Aún no tienes reportes. ¡Crea el primero!"
+                android:text="No hay tipos de reporte para esta área aún."
                 android:textColor="#AAAAAA"
                 android:textSize="14sp"
                 android:gravity="center"
                 android:padding="20dp"
                 android:visibility="gone"/>
 
-            <!-- Botón logout — temporal hasta que haya pantalla de perfil -->
-            <Button
-                android:id="@+id/btnLogout"
+            <!--
+                RecyclerView en vez de GridLayout fijo —
+                así los tipos vienen de Firestore y no están
+                hardcodeados en el XML
+            -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerTipos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/logout"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#B25E15"
-                android:layout_marginTop="8dp"/>
+                android:nestedScrollingEnabled="false"/>
 
         </LinearLayout>
     </ScrollView>

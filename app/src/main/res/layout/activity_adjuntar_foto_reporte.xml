@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdjuntarFotoReporteActivity">
+
+    <!-- Header — sin cambios -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#E07A1B"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/logobugareporta"
+            android:contentDescription="@string/logo_description"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_title"
+                android:textColor="#FFF"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_slogan"
+                android:textColor="#FFF"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnPerfil"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_launcher_foreground"
+            android:background="@drawable/circle_bg"
+            android:contentDescription="@string/profile_description"
+            android:padding="2dp"/>
+    </LinearLayout>
+
+    <!-- Contenido scrollable — sin cambios en el ScrollView -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Título — sin cambios -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. Adjuntar foto"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#222"
+                android:layout_marginBottom="8dp"/>
+
+            <!--
+                MODIFICACIÓN: texto actualizado — deja claro que es opcional
+                El texto original decía que era para "identificar el problema"
+                pero no mencionaba que era opcional
+            -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adjunta una foto si la tienes (Opcional)"
+                android:textSize="14sp"
+                android:textColor="#666"
+                android:layout_marginBottom="20dp"/>
+
+            <!--
+                MODIFICACIÓN: el ImageView ahora tiene:
+                - id cambiado a imgFotoPrevia (el Java lo referencia así)
+                - visibility="gone" — empieza oculto, se muestra
+                  solo cuando el usuario elige una foto
+                - background con input_bg en vez del gris plano
+                - height reducida a 200dp para dejar espacio al texto de estado
+            -->
+            <ImageView
+                android:id="@+id/imgFotoPrevia"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@drawable/input_bg"
+                android:scaleType="centerCrop"
+                android:contentDescription="Foto del reporte"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp"/>
+
+            <!--
+                NUEVO: texto que muestra el estado de la foto.
+                Empieza diciendo que no hay foto (color gris).
+                El Java lo cambia a verde cuando el usuario adjunta algo.
+            -->
+            <TextView
+                android:id="@+id/tvEstadoFoto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sin foto adjunta — el reporte se enviará sin imagen"
+                android:textSize="12sp"
+                android:textColor="#AAAAAA"
+                android:gravity="center"
+                android:layout_marginBottom="20dp"/>
+
+            <!--
+                MODIFICACIÓN: los dos botones ahora están en una fila horizontal
+                en vez de uno encima del otro — igual al prototipo.
+                Usan estilo OutlinedButton con texto naranja en vez de fondo naranja sólido.
+            -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <Button
+                    android:id="@+id/btnTomarFoto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="📷 Cámara"
+                    android:backgroundTint="#FFFFFF"
+                    android:textColor="#E07A1B"
+                    android:layout_marginEnd="8dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                <Button
+                    android:id="@+id/btnSeleccionarFoto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🖼️ Galería"
+                    android:backgroundTint="#FFFFFF"
+                    android:textColor="#E07A1B"
+                    android:layout_marginStart="8dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+            </LinearLayout>
+
+            <!--
+                NUEVO: ProgressBar que se muestra mientras se guarda el reporte.
+                Empieza oculta (gone) y el Java la muestra al presionar enviar.
+            -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Botón enviar — sin cambios visuales -->
+            <Button
+                android:id="@+id/btnEnviarReporte"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enviar reporte"
+                android:backgroundTint="#E07A1B"
+                android:textColor="#FFF"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Navbar — sin cambios -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#FFF"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
