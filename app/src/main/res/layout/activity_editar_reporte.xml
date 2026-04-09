@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".EditarReporteActivity">
+
+    <!-- Header -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_header"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Editar Reporte"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#222"
+                android:layout_marginBottom="24dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Asunto"
+                android:textStyle="bold"
+                android:textColor="#444"
+                android:layout_marginBottom="8dp"/>
+
+            <EditText
+                android:id="@+id/etEditarAsunto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Asunto del reporte"
+                android:background="@drawable/bg_input"
+                android:padding="12dp"
+                android:layout_marginBottom="24dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descripción"
+                android:textStyle="bold"
+                android:textColor="#444"
+                android:layout_marginBottom="8dp"/>
+
+            <EditText
+                android:id="@+id/etEditarDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:hint="Descripción del problema"
+                android:gravity="top"
+                android:background="@drawable/bg_input"
+                android:padding="12dp"
+                android:layout_marginBottom="32dp"/>
+
+            <Button
+                android:id="@+id/btnGuardarCambios"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Guardar Cambios"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#B25E15"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Navbar -->
+    <include
+        android:id="@+id/bottomNavigationView"
+        layout="@layout/layout_navbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

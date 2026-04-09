@@ -245,7 +245,18 @@
 
             </LinearLayout>
 
-            <!-- Botón Eliminar -->
+            <!-- Botones de Acción -->
+            <Button
+                android:id="@+id/btnEditarReporte"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Editar reporte"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#B25E15"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                app:cornerRadius="8dp"/>
+
             <Button
                 android:id="@+id/btnEliminarReporte"
                 android:layout_width="match_parent"

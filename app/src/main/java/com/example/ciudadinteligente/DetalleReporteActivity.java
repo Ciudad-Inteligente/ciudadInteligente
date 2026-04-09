@@ -1,6 +1,7 @@
 package com.example.ciudadinteligente;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class DetalleReporteActivity extends AppCompatActivity {
     private ImageView ivFoto;
     private RecyclerView rvHistorial;
     private HistorialAdapter adapter;
-    private Button btnEliminar;
+    private Button btnEliminar, btnEditar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class DetalleReporteActivity extends AppCompatActivity {
         ivFoto = findViewById(R.id.ivDetalleFoto);
         rvHistorial = findViewById(R.id.rvHistorial);
         btnEliminar = findViewById(R.id.btnEliminarReporte);
+        btnEditar = findViewById(R.id.btnEditarReporte);
 
         rvHistorial.setLayoutManager(new LinearLayoutManager(this));
         adapter = new HistorialAdapter(new ArrayList<>());
@@ -76,7 +78,15 @@ public class DetalleReporteActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_mis_reportes);
 
+        // Configurar botones
         btnEliminar.setOnClickListener(v -> confirmarEliminacion());
+        
+        btnEditar.setOnClickListener(v -> {
+            Intent intent = new Intent(DetalleReporteActivity.this, EditarReporteActivity.class);
+            intent.putExtra("REPORTE_ID", reporteId);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
 
         if (reporteId != null) {
             cargarDatosReporte();
@@ -143,12 +153,11 @@ public class DetalleReporteActivity extends AppCompatActivity {
     }
 
     private void eliminarReporteLogico() {
-        // No eliminamos, cambiamos el campo 'visible' a false (eliminación lógica)
         db.collection("reportes").document(reporteId)
                 .update("visible", false)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Reporte eliminado correctamente", Toast.LENGTH_SHORT).show();
-                    finish(); // Cerrar la pantalla y volver a la lista
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error al eliminar el reporte", Toast.LENGTH_SHORT).show();
