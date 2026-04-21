@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +21,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -29,6 +29,7 @@ import java.util.Map;
 
 public class RegistroCiudadano extends AppCompatActivity {
     private EditText editTextIdentificacion, editTextNombre, editTextCorreo, editTextPassword, editTextConfirmarPassword;
+    private EditText editTextTelefono, editTextDepartamento, editTextCiudad, editTextDireccion;
     private Button btnRegistrar;
     private TextView textViewMensaje;
     private FirebaseAuth mAuth;
@@ -47,6 +48,10 @@ public class RegistroCiudadano extends AppCompatActivity {
 
         editTextIdentificacion = findViewById(R.id.editTextIdentificacion);
         editTextNombre = findViewById(R.id.editTextNombre);
+        editTextTelefono = findViewById(R.id.editTextTelefono);
+        editTextDepartamento = findViewById(R.id.editTextDepartamento);
+        editTextCiudad = findViewById(R.id.editTextCiudad);
+        editTextDireccion = findViewById(R.id.editTextDireccion);
         editTextCorreo = findViewById(R.id.editTextCorreo);
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextConfirmarPassword = findViewById(R.id.editTextConfirmarPassword);
@@ -68,12 +73,18 @@ public class RegistroCiudadano extends AppCompatActivity {
         textViewMensaje.setText("");
         final String identificacion = editTextIdentificacion.getText().toString().trim();
         final String nombre = editTextNombre.getText().toString().trim();
+        final String telefono = editTextTelefono.getText().toString().trim();
+        final String departamento = editTextDepartamento.getText().toString().trim();
+        final String ciudad = editTextCiudad.getText().toString().trim();
+        final String direccion = editTextDireccion.getText().toString().trim();
         final String correo = editTextCorreo.getText().toString().trim();
         final String password = editTextPassword.getText().toString();
         final String confirmarPassword = editTextConfirmarPassword.getText().toString();
 
         // Validaciones frontend
-        if (TextUtils.isEmpty(identificacion) || TextUtils.isEmpty(nombre) || TextUtils.isEmpty(correo) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmarPassword)) {
+        if (TextUtils.isEmpty(identificacion) || TextUtils.isEmpty(nombre) || TextUtils.isEmpty(telefono) || 
+            TextUtils.isEmpty(departamento) || TextUtils.isEmpty(ciudad) || TextUtils.isEmpty(direccion) ||
+            TextUtils.isEmpty(correo) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmarPassword)) {
             textViewMensaje.setText("Todos los campos son obligatorios.");
             return;
         }
@@ -102,7 +113,7 @@ public class RegistroCiudadano extends AppCompatActivity {
                                 textViewMensaje.setText("La identificación ya está registrada.");
                             } else {
                                 // Intentar registrar en Firebase Auth
-                                crearUsuarioFirebaseAuth(identificacion, nombre, correo, password);
+                                crearUsuarioFirebaseAuth(identificacion, nombre, telefono, departamento, ciudad, direccion, correo, password);
                             }
                         } else {
                             textViewMensaje.setText("Error al validar identificación. Intenta de nuevo.");
@@ -111,7 +122,9 @@ public class RegistroCiudadano extends AppCompatActivity {
                 });
     }
 
-    private void crearUsuarioFirebaseAuth(final String identificacion, final String nombre, final String correo, final String password) {
+    private void crearUsuarioFirebaseAuth(final String identificacion, final String nombre, final String telefono, 
+                                          final String departamento, final String ciudad, final String direccion,
+                                          final String correo, final String password) {
         mAuth.createUserWithEmailAndPassword(correo, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -126,7 +139,7 @@ public class RegistroCiudadano extends AppCompatActivity {
                                             public void onComplete(Task<Void> verificationTask) {
                                                 if (verificationTask.isSuccessful()) {
                                                     // Correo de verificación enviado exitosamente
-                                                    guardarUsuarioFirestore(identificacion, nombre, correo);
+                                                    guardarUsuarioFirestore(identificacion, nombre, telefono, departamento, ciudad, direccion, correo);
                                                 } else {
                                                     textViewMensaje.setText("Error al enviar correo de verificación.");
                                                 }
@@ -144,16 +157,20 @@ public class RegistroCiudadano extends AppCompatActivity {
                 });
     }
 
-    private void guardarUsuarioFirestore(String identificacion, String nombre, String correo) {
+    private void guardarUsuarioFirestore(String identificacion, String nombre, String telefono, 
+                                         String departamento, String ciudad, String direccion, String correo) {
         Map<String, Object> usuario = new HashMap<>();
         usuario.put("id", identificacion);
         usuario.put("nombre", nombre);
+        usuario.put("telefono", telefono);
+        usuario.put("departamento", departamento);
+        usuario.put("ciudad", ciudad);
+        usuario.put("direccion", direccion);
         usuario.put("correo", correo);
         usuario.put("rol", "Ciudadano");
         usuario.put("area", null);
         usuario.put("cargo", null);
         usuario.put("estado", "PENDIENTE"); // Estado inicial: pendiente de verificación de correo
-        // La contraseña ya está hasheada por Firebase Auth, no se almacena aquí
 
         db.collection("users")
                 .document(mAuth.getCurrentUser().getUid())
@@ -162,8 +179,7 @@ public class RegistroCiudadano extends AppCompatActivity {
                     @Override
                     public void onComplete(Task<Void> task) {
                         if (task.isSuccessful()) {
-                            textViewMensaje.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-                            textViewMensaje.setText("¡Registro exitoso! Verifica tu correo electrónico para activar tu cuenta.");
+                            Toast.makeText(RegistroCiudadano.this, "¡Registro exitoso! Por favor, verifica tu correo electrónico para activar tu cuenta.", Toast.LENGTH_LONG).show();
                             limpiarCampos();
                             // Volver a LoginUsuario
                             finish();
@@ -177,6 +193,10 @@ public class RegistroCiudadano extends AppCompatActivity {
     private void limpiarCampos() {
         editTextIdentificacion.setText("");
         editTextNombre.setText("");
+        editTextTelefono.setText("");
+        editTextDepartamento.setText("");
+        editTextCiudad.setText("");
+        editTextDireccion.setText("");
         editTextCorreo.setText("");
         editTextPassword.setText("");
         editTextConfirmarPassword.setText("");
