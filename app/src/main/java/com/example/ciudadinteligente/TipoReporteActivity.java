@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,16 +17,18 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ciudadinteligente.api.ReporteDTO;
+import com.example.ciudadinteligente.api.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TipoReporteActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db;
     private RecyclerView recyclerTipos;
     private ProgressBar progressBar;
     private TextView tvSinTipos;
@@ -38,15 +39,12 @@ public class TipoReporteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tipo_reporte);
-        
-        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
-
-        db = FirebaseFirestore.getInstance();
 
         areaNombre = getIntent().getStringExtra("AREA_SELECCIONADA");
         if (areaNombre == null) areaNombre = "";
@@ -60,14 +58,13 @@ public class TipoReporteActivity extends AppCompatActivity {
 
         tvNombreArea.setText(areaNombre);
         tvDescripcionArea.setText(obtenerDescripcionArea(areaNombre));
-
         recyclerTipos.setLayoutManager(new GridLayoutManager(this, 2));
 
         bottomNav.setSelectedItemId(R.id.nav_reportar);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_reportar) return true;
-            
+
             Intent intent = null;
             if (id == R.id.nav_inicio) {
                 intent = new Intent(this, DashboardCiudadano.class);
@@ -94,42 +91,82 @@ public class TipoReporteActivity extends AppCompatActivity {
         recyclerTipos.setVisibility(View.GONE);
         tvSinTipos.setVisibility(View.GONE);
 
-        db.collection("tipos_reporte")
-                .whereEqualTo("area", areaNombre)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    progressBar.setVisibility(View.GONE);
+        // Paso 1 — traer todas las áreas y encontrar el id del área actual
+        RetrofitClient.getApi().listarAreas()
+                .enqueue(new Callback<List<ReporteDTO.AreaDTO>>() {
+                    @Override
+                    public void onResponse(Call<List<ReporteDTO.AreaDTO>> call,
+                                           Response<List<ReporteDTO.AreaDTO>> response) {
+                        if (!response.isSuccessful() || response.body() == null) {
+                            mostrarError();
+                            return;
+                        }
 
-                    if (querySnapshot.isEmpty()) {
-                        tvSinTipos.setVisibility(View.VISIBLE);
-                        return;
+                        // Buscar el id del área por nombre
+                        Long idArea = null;
+                        for (ReporteDTO.AreaDTO area : response.body()) {
+                            if (area.nombre.equals(areaNombre)) {
+                                idArea = area.id;
+                                break;
+                            }
+                        }
+
+                        if (idArea == null) {
+                            mostrarError();
+                            return;
+                        }
+
+                        // Paso 2 — traer los tipos de reporte de esa área
+                        cargarTiposPorArea(idArea);
                     }
 
-                    List<TipoReporte> lista = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : querySnapshot) {
-                        lista.add(new TipoReporte(
-                                doc.getId(),
-                                doc.getString("nombre") != null ? doc.getString("nombre") : "Sin nombre",
-                                doc.getString("icono")  != null ? doc.getString("icono")  : "ic_default",
-                                areaNombre
-                        ));
+                    @Override
+                    public void onFailure(Call<List<ReporteDTO.AreaDTO>> call, Throwable t) {
+                        mostrarError();
                     }
-
-                    recyclerTipos.setVisibility(View.VISIBLE);
-                    recyclerTipos.setAdapter(new TiposAdapter(lista, tipo -> {
-                        Intent intent = new Intent(this, CrearReporteActivity.class);
-                        intent.putExtra("AREA_SELECCIONADA", areaNombre);
-                        intent.putExtra("TIPO_ID",           tipo.id);
-                        intent.putExtra("TIPO_NOMBRE",       tipo.nombre);
-                        startActivity(intent);
-                        overridePendingTransition(0, 0);
-                    }));
-                })
-                .addOnFailureListener(e -> {
-                    progressBar.setVisibility(View.GONE);
-                    tvSinTipos.setVisibility(View.VISIBLE);
-                    tvSinTipos.setText("Error al cargar. Revisa tu conexión.");
                 });
+    }
+
+    private void cargarTiposPorArea(Long idArea) {
+        RetrofitClient.getApi().listarTiposPorArea(idArea)
+                .enqueue(new Callback<List<ReporteDTO.TipoReporteDTO>>() {
+                    @Override
+                    public void onResponse(Call<List<ReporteDTO.TipoReporteDTO>> call,
+                                           Response<List<ReporteDTO.TipoReporteDTO>> response) {
+                        progressBar.setVisibility(View.GONE);
+
+                        if (!response.isSuccessful() || response.body() == null
+                                || response.body().isEmpty()) {
+                            tvSinTipos.setVisibility(View.VISIBLE);
+                            return;
+                        }
+
+                        recyclerTipos.setVisibility(View.VISIBLE);
+                        recyclerTipos.setAdapter(new TiposAdapter(
+                                response.body(), tipo -> {
+                            Intent intent = new Intent(
+                                    TipoReporteActivity.this, CrearReporteActivity.class);
+                            intent.putExtra("AREA_SELECCIONADA", areaNombre);
+                            intent.putExtra("TIPO_ID",     String.valueOf(tipo.id));
+                            intent.putExtra("TIPO_NOMBRE", tipo.nombre);
+                            startActivity(intent);
+                            overridePendingTransition(0, 0);
+                        }));
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<ReporteDTO.TipoReporteDTO>> call,
+                                          Throwable t) {
+                        progressBar.setVisibility(View.GONE);
+                        mostrarError();
+                    }
+                });
+    }
+
+    private void mostrarError() {
+        progressBar.setVisibility(View.GONE);
+        tvSinTipos.setVisibility(View.VISIBLE);
+        tvSinTipos.setText("Error al cargar. Revisa tu conexión.");
     }
 
     private String obtenerDescripcionArea(String area) {
@@ -154,30 +191,25 @@ public class TipoReporteActivity extends AppCompatActivity {
         }
     }
 
-    static class TipoReporte {
-        String id, nombre, icono, area;
-        TipoReporte(String id, String nombre, String icono, String area) {
-            this.id = id; this.nombre = nombre;
-            this.icono = icono; this.area = area;
-        }
-    }
-
+    // Adapter
+    // Interfaz fuera del adapter
     interface OnTipoClickListener {
-        void onClick(TipoReporte tipo);
+        void onClick(ReporteDTO.TipoReporteDTO tipo);
     }
 
+    // Adapter
     class TiposAdapter extends RecyclerView.Adapter<TiposAdapter.ViewHolder> {
-        private final List<TipoReporte> lista;
+        private final List<ReporteDTO.TipoReporteDTO> lista;
         private final OnTipoClickListener listener;
 
-        TiposAdapter(List<TipoReporte> lista, OnTipoClickListener listener) {
+        TiposAdapter(List<ReporteDTO.TipoReporteDTO> lista, OnTipoClickListener listener) {
             this.lista    = lista;
             this.listener = listener;
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
             ImageView imgIcono;
-            TextView tvNombre;
+            TextView  tvNombre;
             ViewHolder(View v) {
                 super(v);
                 imgIcono = v.findViewById(R.id.imgIcono);
@@ -187,16 +219,19 @@ public class TipoReporteActivity extends AppCompatActivity {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tipo_reporte, parent, false);
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_tipo_reporte, parent, false);
             return new ViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            TipoReporte tipo = lista.get(position);
+            ReporteDTO.TipoReporteDTO tipo = lista.get(position);
             holder.tvNombre.setText(tipo.nombre);
-            int iconoId = getResources().getIdentifier(tipo.icono, "drawable", getPackageName());
-            holder.imgIcono.setImageResource(iconoId != 0 ? iconoId : R.drawable.ic_default);
+            int iconoId = getResources().getIdentifier(
+                    tipo.icono, "drawable", getPackageName());
+            holder.imgIcono.setImageResource(
+                    iconoId != 0 ? iconoId : R.drawable.ic_default);
             holder.itemView.setOnClickListener(v -> listener.onClick(tipo));
         }
 
