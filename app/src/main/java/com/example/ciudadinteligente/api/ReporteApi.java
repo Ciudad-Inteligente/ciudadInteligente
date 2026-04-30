@@ -27,4 +27,8 @@ public interface ReporteApi {
 
     @GET("tipos-reporte/area/{idArea}")
     Call<List<ReporteDTO.TipoReporteDTO>> listarTiposPorArea(@Path("idArea") Long idArea);
+
+    //  Obtener historial visible del reporte
+    @GET("ciudadano/reports/{id}/history")
+    Call<List<HistorialCambioDTO>> obtenerHistorial(@Path("id") long id, @Header("X-User-UID") String uid);
 }

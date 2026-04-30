@@ -21,12 +21,16 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ciudadinteligente.api.HistorialCambioDTO;
 import com.example.ciudadinteligente.api.ReporteDTO;
 import com.example.ciudadinteligente.api.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,6 +39,7 @@ import retrofit2.Response;
 public class DetalleReporteActivity extends AppCompatActivity {
 
     private long reporteId;
+    private String uidCiudadano;
 
     private TextView tvAsunto, tvEstado, tvArea, tvTipo, tvFecha,
             tvDireccion, tvDescripcion, tvSinHistorial;
@@ -55,6 +60,11 @@ public class DetalleReporteActivity extends AppCompatActivity {
         });
 
         reporteId = getIntent().getLongExtra("REPORTE_ID", -1);
+
+        // Obtener UID del ciudadano desde Firebase
+        uidCiudadano = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : "desconocido";
 
         tvAsunto      = findViewById(R.id.tvDetalleAsunto);
         tvEstado      = findViewById(R.id.tvDetalleEstado);
@@ -86,6 +96,7 @@ public class DetalleReporteActivity extends AppCompatActivity {
 
         if (reporteId != -1) {
             cargarDatosReporte();
+            cargarHistorial();
         }
     }
 
@@ -117,10 +128,6 @@ public class DetalleReporteActivity extends AppCompatActivity {
                             if (r.fechaReporte != null && r.fechaReporte.length() >= 10) {
                                 tvFecha.setText(r.fechaReporte.substring(0, 10));
                             }
-
-                            // El historial viene del microservicio en Sprint 2
-                            // Por ahora mostramos el mensaje vacío
-                            tvSinHistorial.setVisibility(View.VISIBLE);
                         }
                     }
 
@@ -129,6 +136,47 @@ public class DetalleReporteActivity extends AppCompatActivity {
                         Toast.makeText(DetalleReporteActivity.this,
                                 "Error al cargar: " + t.getMessage(),
                                 Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * 🆕 Cargar historial de cambios desde el backend
+     */
+    private void cargarHistorial() {
+        RetrofitClient.getApi().obtenerHistorial(reporteId, uidCiudadano)
+                .enqueue(new Callback<List<HistorialCambioDTO>>() {
+                    @Override
+                    public void onResponse(Call<List<HistorialCambioDTO>> call,
+                                           Response<List<HistorialCambioDTO>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<HistorialCambioDTO> historialCompleto = response.body();
+
+                            // Filtrar solo items visibles para el ciudadano
+                            List<HistorialCambioDTO> historialVisible = new ArrayList<>();
+                            for (HistorialCambioDTO item : historialCompleto) {
+                                if (item.visibleCiudadano != null && item.visibleCiudadano) {
+                                    historialVisible.add(item);
+                                }
+                            }
+
+                            if (historialVisible.isEmpty()) {
+                                tvSinHistorial.setVisibility(View.VISIBLE);
+                                rvHistorial.setVisibility(View.GONE);
+                            } else {
+                                tvSinHistorial.setVisibility(View.GONE);
+                                rvHistorial.setVisibility(View.VISIBLE);
+                                adapter.updateList(historialVisible);
+                            }
+                        } else {
+                            tvSinHistorial.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<HistorialCambioDTO>> call, Throwable t) {
+                        // No mostramos error, solo el mensaje vacío
+                        tvSinHistorial.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -181,22 +229,18 @@ public class DetalleReporteActivity extends AppCompatActivity {
         badge.setTextColor(Color.parseColor(texto));
     }
 
-    // ── Historial — se implementa en Sprint 2 ────────────────────────────────
+    // ── Adapter para mostrar historial con HistorialCambioDTO ────────────────────
 
-    static class HistorialItem {
-        String estado, mensaje, fecha;
-        HistorialItem(String e, String m, String f) {
-            this.estado = e; this.mensaje = m; this.fecha = f;
+    static class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.ViewHolder> {
+        private List<HistorialCambioDTO> lista;
+        private static final SimpleDateFormat dateFormat =
+                new SimpleDateFormat("dd MMM yyyy · HH:mm", new Locale("es", "ES"));
+
+        HistorialAdapter(List<HistorialCambioDTO> l) {
+            this.lista = l;
         }
-    }
 
-    static class HistorialAdapter
-            extends RecyclerView.Adapter<HistorialAdapter.ViewHolder> {
-        private List<HistorialItem> lista;
-
-        HistorialAdapter(List<HistorialItem> l) { this.lista = l; }
-
-        void updateList(List<HistorialItem> n) {
+        void updateList(List<HistorialCambioDTO> n) {
             this.lista = n;
             notifyDataSetChanged();
         }
@@ -210,18 +254,41 @@ public class DetalleReporteActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            HistorialItem item = lista.get(position);
-            holder.tvEstado.setText("Estado: " + (item.estado != null
-                    ? item.estado : "Actualizado"));
-            holder.tvMensaje.setText(item.mensaje);
-            holder.tvFecha.setText(item.fecha);
+            HistorialCambioDTO item = lista.get(position);
+
+            // Mostrar descripción o tipo
+            String titulo = item.descripcion != null ? item.descripcion
+                    : (item.tipo != null ? "Actualización: " + item.tipo : "Actualizado");
+            holder.tvEstado.setText(titulo);
+
+            // Mostrar comentario si existe
+            if (item.comentario != null && !item.comentario.isEmpty()) {
+                holder.tvMensaje.setText(item.comentario);
+                holder.tvMensaje.setVisibility(View.VISIBLE);
+            } else {
+                holder.tvMensaje.setVisibility(View.GONE);
+            }
+
+            // Formatear fecha
+            if (item.fechaCambio != null) {
+                try {
+                    // La fecha viene como "2024-04-29T21:00:00"
+                    String fechaFormato = item.fechaCambio.replace("T", " ").substring(0, 16);
+                    holder.tvFecha.setText(fechaFormato);
+                } catch (Exception e) {
+                    holder.tvFecha.setText(item.fechaCambio);
+                }
+            }
         }
 
         @Override
-        public int getItemCount() { return lista.size(); }
+        public int getItemCount() {
+            return lista.size();
+        }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvEstado, tvFecha, tvMensaje;
+
             ViewHolder(View v) {
                 super(v);
                 tvEstado  = v.findViewById(R.id.tvHistorialEstado);

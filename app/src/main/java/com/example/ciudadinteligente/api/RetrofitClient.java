@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    // Mientras el microservicio corre en tu PC
+    // Mientras el microservicio corre en el PC
     // Emulador → 10.0.2.2
     // Celular físico → la IP de tu PC en WiFi (ej: 192.168.1.X)
     private static final String BASE_URL = "https://microservicioreportes-production.up.railway.app/";
