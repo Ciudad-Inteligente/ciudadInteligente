@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,16 +44,11 @@ public class DashboardCiudadano extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Habilitar modo EdgeToEdge
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_dashboard_ciudadano);
         
-        // CORRECCIÓN PARA EL NAVBAR (Hueco en blanco):
-        // Eliminamos el padding inferior del contenedor principal para que el navbar 
-        // toque el borde real de la pantalla.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Solo aplicamos padding arriba (barra estado) y a los lados
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
@@ -59,7 +56,6 @@ public class DashboardCiudadano extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Vincular vistas
         textViewBienvenida = findViewById(R.id.textViewBienvenida);
         tvSinReportes      = findViewById(R.id.tvSinReportes);
         recyclerReportes   = findViewById(R.id.recyclerReportes);
@@ -68,28 +64,16 @@ public class DashboardCiudadano extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
 
         recyclerReportes.setLayoutManager(new LinearLayoutManager(this));
-
-        // Marcar qué tab está activo
         bottomNav.setSelectedItemId(R.id.nav_inicio);
 
         obtenerDatosUsuario();
         cargarUltimosReportes();
 
-        // Logout
-        btnLogout.setOnClickListener(v -> {
-            mAuth.signOut();
-            Intent intent = new Intent(this, LoginUsuario.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+        btnLogout.setOnClickListener(v -> cerrarSesion());
 
-        // Perfil
-        btnPerfil.setOnClickListener(v -> {
-            // TODO: PerfilActivity
-        });
+        // AHORA EL BOTÓN DESPLIEGA UN MENÚ
+        btnPerfil.setOnClickListener(v -> mostrarMenuPerfil(v));
 
-        // Navegación inferior
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_inicio) return true;
@@ -101,11 +85,38 @@ public class DashboardCiudadano extends AppCompatActivity {
                 startActivity(new Intent(this, MisReportesActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
                 return true;
             } else if (id == R.id.nav_estadisticas) {
-                // TODO: EstadisticasActivity
                 return true;
             }
             return false;
         });
+    }
+
+    private void mostrarMenuPerfil(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+        popup.getMenu().add(0, 1, 0, "Ver perfil");
+        popup.getMenu().add(0, 2, 1, "Cerrar sesión");
+
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1:
+                    startActivity(new Intent(DashboardCiudadano.this, PerfilActivity.class));
+                    return true;
+                case 2:
+                    cerrarSesion();
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popup.show();
+    }
+
+    private void cerrarSesion() {
+        mAuth.signOut();
+        Intent intent = new Intent(this, LoginUsuario.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void obtenerDatosUsuario() {

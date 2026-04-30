@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".PerfilActivity">
+
+    <!-- Header Incluido -->
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_header"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Card de Perfil -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center_horizontal">
+
+                    <!-- Foto de Perfil -->
+                    <RelativeLayout
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginBottom="12dp">
+                        <ImageView
+                            android:id="@+id/imgFotoPerfil"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_launcher_foreground"
+                            android:background="@drawable/circle_bg"
+                            android:padding="4dp"
+                            android:scaleType="centerCrop"/>
+                        <ImageButton
+                            android:id="@+id/btnCambiarFoto"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentBottom="true"
+                            android:background="@drawable/circle_bg"
+                            android:backgroundTint="#E07A1B"
+                            android:src="@android:drawable/ic_menu_camera"
+                            app:tint="#FFF"
+                            android:padding="6dp"/>
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/tvNombrePerfil"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nombre Usuario"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#222"/>
+
+                    <TextView
+                        android:id="@+id/tvRolPerfil"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ciudadano"
+                        android:textSize="14sp"
+                        android:textColor="#E07A1B"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Sección Datos Personales -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Datos Personales"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#61461D"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Identificación" android:textSize="12sp" android:textColor="#888" android:layout_marginStart="12dp"/>
+                    <EditText
+                        android:id="@+id/etPerfilIdentificacion"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:enabled="false"
+                        android:background="@drawable/bg_input"
+                        android:paddingHorizontal="20dp"
+                        android:textColor="#555"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Correo Electrónico" android:textSize="12sp" android:textColor="#888" android:layout_marginStart="12dp"/>
+                    <EditText
+                        android:id="@+id/etPerfilCorreo"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:enabled="false"
+                        android:background="@drawable/bg_input"
+                        android:paddingHorizontal="20dp"
+                        android:textColor="#555"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Teléfono" android:textSize="12sp" android:textColor="#888" android:layout_marginStart="12dp"/>
+                    <EditText
+                        android:id="@+id/etPerfilTelefono"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:enabled="false"
+                        android:background="@drawable/bg_input"
+                        android:paddingHorizontal="20dp"
+                        android:textColor="#222"
+                        android:textSize="15sp"
+                        android:inputType="phone"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Departamento" android:textSize="12sp" android:textColor="#888" android:layout_marginStart="12dp"/>
+                    <EditText
+                        android:id="@+id/etPerfilDepartamento"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:enabled="false"
+                        android:background="@drawable/bg_input"
+                        android:paddingHorizontal="20dp"
+                        android:textColor="#222"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ciudad" android:textSize="12sp" android:textColor="#888" android:layout_marginStart="12dp"/>
+                    <EditText
+                        android:id="@+id/etPerfilCiudad"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:enabled="false"
+                        android:background="@drawable/bg_input"
+                        android:paddingHorizontal="20dp"
+                        android:textColor="#222"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dirección" android:textSize="12sp" android:textColor="#888" android:layout_marginStart="12dp"/>
+                    <EditText
+                        android:id="@+id/etPerfilDireccion"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:enabled="false"
+                        android:background="@drawable/bg_input"
+                        android:paddingHorizontal="20dp"
+                        android:textColor="#222"
+                        android:textSize="15sp"
+                        android:layout_marginBottom="20dp"/>
+
+                    <Button
+                        android:id="@+id/btnEditarPerfil"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="Editar Datos"
+                        android:background="@drawable/bg_button_primary"
+                        app:backgroundTint="@null"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Sección Seguridad -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Seguridad"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#61461D"/>
+                <CheckBox
+                    android:id="@+id/cbCambiarPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cambiar contraseña"
+                    android:buttonTint="#B25E15"/>
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                android:visibility="gone"
+                android:layout_marginBottom="32dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Password Actual Redonda -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:passwordToggleEnabled="true"
+                        android:layout_marginBottom="12dp"
+                        app:boxCornerRadiusTopStart="25dp"
+                        app:boxCornerRadiusTopEnd="25dp"
+                        app:boxCornerRadiusBottomStart="25dp"
+                        app:boxCornerRadiusBottomEnd="25dp"
+                        app:boxStrokeColor="#B25E15"
+                        app:hintTextColor="#B25E15"
+                        android:textColorHint="#888"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPasswordActual"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Contraseña actual"
+                            android:inputType="textPassword"
+                            android:paddingHorizontal="20dp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Nueva Password Redonda -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:passwordToggleEnabled="true"
+                        android:layout_marginBottom="12dp"
+                        app:boxCornerRadiusTopStart="25dp"
+                        app:boxCornerRadiusTopEnd="25dp"
+                        app:boxCornerRadiusBottomStart="25dp"
+                        app:boxCornerRadiusBottomEnd="25dp"
+                        app:boxStrokeColor="#B25E15"
+                        app:hintTextColor="#B25E15"
+                        android:textColorHint="#888"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPasswordNueva"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Nueva contraseña"
+                            android:inputType="textPassword"
+                            android:paddingHorizontal="20dp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Confirmar Nueva Password Redonda -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:passwordToggleEnabled="true"
+                        android:layout_marginBottom="20dp"
+                        app:boxCornerRadiusTopStart="25dp"
+                        app:boxCornerRadiusTopEnd="25dp"
+                        app:boxCornerRadiusBottomStart="25dp"
+                        app:boxCornerRadiusBottomEnd="25dp"
+                        app:boxStrokeColor="#B25E15"
+                        app:hintTextColor="#B25E15"
+                        android:textColorHint="#888"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPasswordConfirmar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Confirmar nueva contraseña"
+                            android:inputType="textPassword"
+                            android:paddingHorizontal="20dp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <Button
+                        android:id="@+id/btnActualizarPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:text="Actualizar Contraseña"
+                        android:background="@drawable/bg_button_primary"
+                        app:backgroundTint="@null"
+                        android:textColor="#FFF"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Navbar Incluido -->
+    <include
+        android:id="@+id/bottomNavigationView"
+        layout="@layout/layout_navbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

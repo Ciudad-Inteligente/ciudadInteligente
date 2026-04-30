@@ -41,6 +41,7 @@
         <activity android:name=".MisReportesActivity" android:exported="false" />
         <activity android:name=".DetalleReporteActivity" android:exported="false" />
         <activity android:name=".EditarReporteActivity" android:exported="false" />
+        <activity android:name=".PerfilActivity" android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

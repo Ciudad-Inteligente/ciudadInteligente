@@ -93,23 +93,77 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:hint="Identificación"
-                    android:padding="14dp"
+                    android:paddingHorizontal="20dp"
                     android:background="@drawable/bg_input"
                     android:textColor="#2F2F2F"
                     android:textColorHint="#A0A0A0"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="12dp"
+                    android:inputType="number" />
 
                 <!-- Nombre -->
                 <EditText
                     android:id="@+id/editTextNombre"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:hint="Nombre"
-                    android:padding="14dp"
+                    android:hint="Nombre completo"
+                    android:paddingHorizontal="20dp"
                     android:background="@drawable/bg_input"
                     android:textColor="#2F2F2F"
                     android:textColorHint="#A0A0A0"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="12dp"
+                    android:inputType="textPersonName" />
+
+                <!-- Teléfono -->
+                <EditText
+                    android:id="@+id/editTextTelefono"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Teléfono / Celular"
+                    android:paddingHorizontal="20dp"
+                    android:background="@drawable/bg_input"
+                    android:textColor="#2F2F2F"
+                    android:textColorHint="#A0A0A0"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="phone" />
+
+                <!-- Departamento -->
+                <EditText
+                    android:id="@+id/editTextDepartamento"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Departamento"
+                    android:paddingHorizontal="20dp"
+                    android:background="@drawable/bg_input"
+                    android:textColor="#2F2F2F"
+                    android:textColorHint="#A0A0A0"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="text" />
+
+                <!-- Ciudad -->
+                <EditText
+                    android:id="@+id/editTextCiudad"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Ciudad"
+                    android:paddingHorizontal="20dp"
+                    android:background="@drawable/bg_input"
+                    android:textColor="#2F2F2F"
+                    android:textColorHint="#A0A0A0"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="text" />
+
+                <!-- Dirección -->
+                <EditText
+                    android:id="@+id/editTextDireccion"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="Dirección de residencia"
+                    android:paddingHorizontal="20dp"
+                    android:background="@drawable/bg_input"
+                    android:textColor="#2F2F2F"
+                    android:textColorHint="#A0A0A0"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="textPostalAddress" />
 
                 <!-- Correo -->
                 <EditText
@@ -118,7 +172,7 @@
                     android:layout_height="50dp"
                     android:hint="Correo electrónico"
                     android:inputType="textEmailAddress"
-                    android:padding="14dp"
+                    android:paddingHorizontal="20dp"
                     android:background="@drawable/bg_input"
                     android:textColor="#2F2F2F"
                     android:textColorHint="#A0A0A0"
@@ -131,7 +185,7 @@
                     android:layout_height="50dp"
                     android:hint="Contraseña"
                     android:inputType="textPassword"
-                    android:padding="14dp"
+                    android:paddingHorizontal="20dp"
                     android:background="@drawable/bg_input"
                     android:textColor="#2F2F2F"
                     android:textColorHint="#A0A0A0"
@@ -144,13 +198,13 @@
                     android:layout_height="50dp"
                     android:hint="Confirmar contraseña"
                     android:inputType="textPassword"
-                    android:padding="14dp"
+                    android:paddingHorizontal="20dp"
                     android:background="@drawable/bg_input"
                     android:textColor="#2F2F2F"
                     android:textColorHint="#A0A0A0"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="24dp" />
 
-                <!-- Botón -->
+                <!-- Botón Registrar -->
                 <Button
                     android:id="@+id/btnRegistrar"
                     android:layout_width="match_parent"
@@ -160,6 +214,21 @@
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:background="@drawable/bg_button_primary"
+                    app:backgroundTint="@null"
+                    android:padding="12dp"
+                    android:letterSpacing="0.05"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Botón Volver -->
+                <Button
+                    android:id="@+id/btnVolverRegistro"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Volver"
+                    android:textSize="16sp"
+                    android:textColor="#555"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_button_secondary"
                     app:backgroundTint="@null"
                     android:padding="12dp"
                     android:letterSpacing="0.05"
